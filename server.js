@@ -36,6 +36,10 @@ if (process.env.DATABASE_URL) {
 }
 
 const app = express();
+
+// Trust proxy - necessary for Render (uses reverse proxy)
+app.set('trust proxy', 1);
+
 const PORT = process.env.PORT || 3000; // Render автоматично задава PORT
 const TARIFFS_FILE = path.join(__dirname, 'data', 'tariffs.json');
 // For deployment, use relative paths. For local development, these can be absolute paths
