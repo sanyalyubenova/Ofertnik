@@ -1,0 +1,15 @@
+[build]
+  command = "npm install"
+  publish = "public"
+  functions = "netlify/functions"
+
+# Само API заявките минават през serverless function
+# HTML файловете се сервират като статични файлове (безплатно)
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/server/:splat"
+  status = 200
+
+# ПРЕМАХНАТО: Redirect за "/*" консумираше много кредити
+# HTML файловете вече се сервират директно от public/ директорията
+

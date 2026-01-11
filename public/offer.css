@@ -1,0 +1,335 @@
+body.offer-page .container {
+    display: block;
+    padding: 0;
+}
+
+body.offer-page header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 50px;
+    background: #eee;
+    color: #333;
+    text-align: left;
+    padding: 10px;
+    border-bottom: 2px solid #000;
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+body.offer-page header h1 {
+    font-size: 18px !important;
+    margin: 0 !important;
+}
+
+body.offer-page header .admin-link,
+body.offer-page header .back-link {
+    background: #ccc;
+    color: #333;
+    border: 1px solid #666;
+    padding: 5px 10px;
+    font-size: 12px;
+    text-decoration: none;
+    border-radius: 0;
+}
+
+body.offer-page header .admin-link:hover,
+body.offer-page header .back-link:hover {
+    background: #aaa;
+}
+
+body.offer-page {
+    overflow: hidden;
+    height: 100vh;
+}
+
+body.offer-page main {
+    position: fixed;
+    top: 50px; /* Below header */
+    left: 0;
+    right: 0;
+    bottom: 40px; /* Above footer */
+    overflow: hidden;
+    padding: 2px;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+}
+
+body.offer-page .card {
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    padding: 2px;
+}
+
+body.offer-page footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 40px;
+    background: #eee;
+    color: #333;
+    text-align: center;
+    padding: 10px;
+    border-top: 2px solid #000;
+    z-index: 200;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.offer-number-section {
+    padding: 15px 20px;
+    border-bottom: 1px solid #e0e0e0;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background-color: #f9f9f9;
+}
+
+.offer-number-section label {
+    font-weight: 600;
+    color: #333;
+    white-space: nowrap;
+}
+
+.offer-number-section input {
+    flex: 1;
+    max-width: 300px;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    font-family: inherit;
+}
+
+.offer-number-section input:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+#offers-container {
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+#offers-container > div:first-child {
+    flex-shrink: 0;
+    margin-bottom: 2px;
+}
+
+#offers-container > div:first-child {
+    flex-shrink: 0;
+    margin-bottom: 1px;
+}
+
+#offers-container > div:first-child button {
+    padding: 3px 6px;
+    font-size: 9px;
+}
+
+#offers-container > table {
+    flex: 1;
+    min-height: 0;
+}
+
+.offers-table-wrapper {
+    flex: 1;
+    overflow: auto;
+    min-height: 0;
+}
+
+.offers-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11px;
+    table-layout: fixed;
+}
+
+.offers-table th,
+.offers-table td {
+    border: 1px solid #000;
+    padding: 9px 3px;
+    text-align: left;
+    vertical-align: top;
+    word-wrap: break-word;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.offers-table th {
+    background: #eee;
+    font-weight: bold;
+}
+
+.offers-table .label {
+    font-weight: bold;
+    background: #f5f5f5;
+    width: 90px;
+    max-width: 90px;
+}
+
+.offers-table .insurance-type-header {
+    background: #333;
+    color: #fff;
+    font-weight: bold;
+    text-align: center;
+}
+
+.offers-table .premium {
+    font-weight: bold;
+    color: #006600;
+}
+
+.offers-table th input[type="checkbox"],
+.offers-table .offer-checkbox {
+    cursor: pointer;
+    width: 16px;
+    height: 16px;
+}
+
+.offers-table th:first-child,
+.offers-table td:first-child {
+    width: 20px;
+    max-width: 20px;
+    padding: 2px;
+}
+
+
+#export-pdf-btn {
+    background: #666;
+    color: #fff;
+    border: 1px solid #333;
+    padding: 8px 15px;
+    font-size: 12px;
+    cursor: pointer;
+    border-radius: 0;
+    margin-bottom: 10px;
+}
+
+#export-pdf-btn:hover {
+    background: #333;
+}
+
+.offers-table th:nth-child(2) {
+    width: 90px;
+    max-width: 90px;
+}
+
+.offers-table .insurer-name {
+    text-align: center;
+    width: 70px;
+    max-width: 70px;
+    font-size: 8px;
+    padding: 2px;
+}
+
+.offers-table .insurer-name br {
+    display: none;
+}
+
+.edit-input,
+.edit-select {
+    width: 100%;
+    padding: 4px 4px;
+    border: 1px solid #666;
+    font-size: 11px;
+    background: #fff;
+    box-sizing: border-box;
+}
+
+.edit-input:focus,
+.edit-select:focus {
+    outline: 2px solid #0066cc;
+    outline-offset: -1px;
+}
+
+.discount-checkboxes,
+.surcharge-checkboxes {
+    font-size: 8px;
+    line-height: 1.2;
+}
+
+.discount-checkboxes label,
+.surcharge-checkboxes label {
+    display: block;
+    margin-bottom: 1px;
+    cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.discount-checkboxes input[type="checkbox"],
+.surcharge-checkboxes input[type="checkbox"] {
+    margin-right: 5px;
+    cursor: pointer;
+}
+
+.discount-list,
+.surcharge-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    font-size: 11px;
+}
+
+.discount-list li,
+.surcharge-list li {
+    margin-bottom: 2px;
+}
+
+/* Bonus/Malus buttons */
+.bonus-malus-btn {
+    padding: 2px 4px;
+    border: 1px solid #000;
+    background-color: #fff;
+    color: #000;
+    cursor: pointer;
+    font-size: 8px;
+    white-space: nowrap;
+}
+
+.bonus-malus-btn:hover {
+    background-color: #f0f0f0;
+}
+
+.bonus-malus-btn.active {
+    background-color: #333;
+    color: #fff;
+}
+
+.casco-bonus-malus {
+    padding: 2px;
+}
+
+.casco-bonus-malus input {
+    text-align: center;
+    width: 40px;
+    padding: 2px;
+    font-size: 8px;
+}
+
+.casco-bonus-malus > div {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    justify-content: center;
+    flex-wrap: wrap;
+}

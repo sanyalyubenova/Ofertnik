@@ -1,0 +1,116 @@
+{
+  "tariffs": [
+    {
+      "fromAge": null,
+      "toAge": 1,
+      "fromValue": null,
+      "toValue": "25564.59",
+      "rate": 5.2
+    },
+    {
+      "fromAge": null,
+      "toAge": 1,
+      "fromValue": "25564.60",
+      "toValue": null,
+      "rate": 4.8
+    },
+    {
+      "fromAge": 1,
+      "toAge": 4,
+      "fromValue": null,
+      "toValue": "25564.59",
+      "rate": 5.5
+    },
+    {
+      "fromAge": 1,
+      "toAge": 4,
+      "fromValue": "25564.60",
+      "toValue": null,
+      "rate": 5
+    },
+    {
+      "fromAge": 4,
+      "toAge": 7,
+      "fromValue": null,
+      "toValue": "12782.30",
+      "rate": 6
+    },
+    {
+      "fromAge": 4,
+      "toAge": 7,
+      "fromValue": "12782.31",
+      "toValue": null,
+      "rate": 5.5
+    },
+    {
+      "fromAge": 7,
+      "toAge": 10,
+      "fromValue": null,
+      "toValue": "12782.30",
+      "rate": 6.4
+    },
+    {
+      "fromAge": 7,
+      "toAge": 10,
+      "fromValue": "12782.31",
+      "toValue": null,
+      "rate": 6
+    },
+    {
+      "fromAge": 10,
+      "toAge": null,
+      "fromValue": null,
+      "toValue": "12782.30",
+      "rate": 7.5
+    },
+    {
+      "fromAge": 10,
+      "toAge": null,
+      "fromValue": 12782.31,
+      "toValue": null,
+      "rate": 7
+    }
+  ],
+  "discounts": [
+    {
+      "type": "other",
+      "value": 5,
+      "description": "еднократно плащане"
+    },
+    {
+      "type": "go",
+      "value": 5
+    },
+    {
+      "type": "new",
+      "value": 10
+    },
+    {
+      "type": "other",
+      "value": 5,
+      "description": "имущество"
+    },
+    {
+      "type": "other",
+      "value": 5,
+      "description": "възраст на собственика над 40 г. до 65 г."
+    }
+  ],
+  "surcharges": [
+    {
+      "type": "МПС над 4 г. до 8 г. и застрахователна сума над 5112.93€ с право на ремонт в сервиз на официален вносител",
+      "condition": "МПС над 4 г. до 8 г. и застрахователна сума над 5112.93€",
+      "value": 30
+    },
+    {
+      "type": "МПС над 12 г. с право на ремонт в доверен сервиз",
+      "condition": "МПС над 12 г.",
+      "value": 10
+    },
+    {
+      "type": "Възраст на собственика от 18 г. до 20 г.",
+      "condition": "Възраст на собственика от 18 г. до 20 г.",
+      "value": 20
+    }
+  ]
+}

@@ -1,0 +1,717 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #f0f0f0;
+    color: #000;
+    height: 100vh;
+    overflow: hidden;
+    position: relative;
+}
+
+body.main-page {
+    padding: 0;
+}
+
+body.main-page .container {
+    width: 100%;
+    height: 100vh;
+    position: relative;
+    padding: 0;
+}
+
+header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 50px;
+    background: #333;
+    color: #fff;
+    padding: 10px 20px;
+    z-index: 1000;
+    border-bottom: 2px solid #000;
+}
+
+body.main-page header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 50px;
+}
+
+body.main-page header h1 {
+    font-size: 18px;
+    margin: 0;
+    font-weight: bold;
+}
+
+body.main-page header .subtitle {
+    font-size: 12px;
+    margin: 0;
+    color: #ccc;
+}
+
+body.main-page header .admin-link {
+    color: #fff;
+    text-decoration: underline;
+    font-size: 12px;
+    padding: 5px 10px;
+    background: #555;
+    border: 1px solid #000;
+}
+
+body.main-page header .admin-link:hover {
+    background: #666;
+}
+
+main {
+    position: fixed;
+    top: 50px;
+    left: 0;
+    right: 0;
+    bottom: 50px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 10px;
+    background: #f0f0f0;
+}
+
+body.main-page main {
+    padding: 10px;
+}
+
+.selector-card {
+    position: fixed;
+    top: 60px;
+    left: 10px;
+    right: 10px;
+    height: 50px;
+    background: #fff;
+    border: 2px solid #000;
+    padding: 10px 20px;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.selector-card h2 {
+    font-size: 14px;
+    margin: 0;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.insurance-types {
+    display: flex;
+    gap: 5px;
+    margin-left: 0;
+}
+
+.insurance-btn {
+    background: #e0e0e0;
+    color: #000;
+    border: 1px solid #000;
+    padding: 5px 15px;
+    font-size: 12px;
+    cursor: pointer;
+    font-weight: normal;
+}
+
+.insurance-btn:hover {
+    background: #d0d0d0;
+}
+
+.insurance-btn.active {
+    background: #333;
+    color: #fff;
+}
+
+.common-data-card {
+    position: fixed;
+    top: 120px;
+    left: 10px;
+    right: 10px;
+    bottom: 60px;
+    background: #fff;
+    border: 2px solid #000;
+    padding: 15px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.insurance-fields {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 2px solid #000;
+}
+
+.insurance-fields h3 {
+    font-size: 14px;
+    margin-bottom: 15px;
+    font-weight: bold;
+    color: #000;
+}
+
+.card {
+    background: #fff;
+    border: 2px solid #000;
+    padding: 15px;
+    margin-bottom: 10px;
+}
+
+.card h2 {
+    font-size: 16px;
+    margin-bottom: 15px;
+    font-weight: bold;
+    color: #000;
+    border-bottom: 1px solid #000;
+    padding-bottom: 5px;
+}
+
+.card h3 {
+    font-size: 14px;
+    margin-bottom: 10px;
+    margin-top: 15px;
+    font-weight: bold;
+    color: #000;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    font-size: 12px;
+    color: #000;
+}
+
+.form-group label .required {
+    color: #f00;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #000;
+    background: #fff;
+    color: #000;
+    font-size: 12px;
+    font-family: Arial, sans-serif;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    outline: 2px solid #000;
+    outline-offset: -2px;
+}
+
+.owner-type-selector,
+.input-type-selector {
+    display: flex;
+    gap: 5px;
+    margin-bottom: 10px;
+}
+
+.owner-type-btn,
+.input-type-btn {
+    flex: 1;
+    padding: 8px;
+    background: #e0e0e0;
+    color: #000;
+    border: 1px solid #000;
+    font-size: 12px;
+    cursor: pointer;
+    font-weight: normal;
+}
+
+.owner-type-btn:hover,
+.input-type-btn:hover {
+    background: #d0d0d0;
+}
+
+.owner-type-btn.active,
+.input-type-btn.active {
+    background: #333;
+    color: #fff;
+}
+
+.autocomplete-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.autocomplete-suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #fff;
+    border: 1px solid #000;
+    border-top: none;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 1000;
+    display: none;
+}
+
+.autocomplete-suggestions.show {
+    display: block;
+}
+
+.autocomplete-suggestion {
+    padding: 10px;
+    cursor: pointer;
+    border-bottom: 1px solid #e0e0e0;
+    font-size: 14px;
+}
+
+.autocomplete-suggestion:hover,
+.autocomplete-suggestion.selected {
+    background: #f0f0f0;
+}
+
+.autocomplete-suggestion:last-child {
+    border-bottom: none;
+}
+
+.btn {
+    background: #333;
+    color: #fff;
+    border: 2px solid #000;
+    padding: 10px 20px;
+    font-size: 14px;
+    cursor: pointer;
+    font-weight: bold;
+    width: 100%;
+    margin-top: 10px;
+}
+
+.btn:hover {
+    background: #555;
+}
+
+.btn:active {
+    background: #000;
+}
+
+.calculate-btn {
+    margin-top: 15px;
+}
+
+.result {
+    margin-top: 15px;
+    padding: 15px;
+    border: 2px solid #000;
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+    display: none;
+    background: #fff;
+}
+
+.result.show {
+    display: block;
+}
+
+.result.success {
+    background: #d4edda;
+    color: #000;
+    border-color: #000;
+}
+
+.result.error {
+    background: #f8d7da;
+    color: #000;
+    border-color: #000;
+}
+
+.comparison-container {
+    width: 100%;
+}
+
+.comparison-container h3 {
+    margin-bottom: 10px;
+    font-size: 14px;
+    font-weight: bold;
+    color: #000;
+}
+
+.comparison-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    background: #fff;
+    border: 2px solid #000;
+}
+
+.comparison-table thead {
+    background: #333;
+    color: #fff;
+}
+
+.comparison-table th {
+    padding: 10px;
+    text-align: left;
+    font-weight: bold;
+    font-size: 12px;
+    border: 1px solid #000;
+}
+
+.comparison-table td {
+    padding: 10px;
+    border: 1px solid #000;
+    font-size: 12px;
+}
+
+.comparison-table tbody tr:hover {
+    background: #f0f0f0;
+}
+
+.comparison-table tbody tr.best-price {
+    background: #d4edda;
+    font-weight: bold;
+}
+
+.comparison-table .premium-cell {
+    text-align: right;
+    font-weight: bold;
+    font-family: 'Courier New', monospace;
+}
+
+footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 50px;
+    background: #333;
+    color: #fff;
+    padding: 10px 20px;
+    text-align: center;
+    z-index: 1000;
+    border-top: 2px solid #000;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.power-input-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.power-input-group input {
+    flex: 1;
+    min-width: 100px;
+}
+
+.power-separator {
+    color: #000;
+    font-weight: bold;
+}
+
+.form-hint {
+    display: block;
+    margin-top: 5px;
+    font-size: 11px;
+    color: #666;
+    font-style: italic;
+}
+
+.input-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.clear-btn {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #666;
+    cursor: pointer;
+    font-size: 16px;
+    width: 24px;
+    height: 24px;
+    display: none;
+    padding: 0;
+}
+
+.clear-btn.show {
+    display: block;
+}
+
+.clear-btn:hover {
+    color: #f00;
+}
+
+/* Admin page styles */
+body.admin-page {
+    overflow: hidden;
+    height: 100vh;
+}
+
+.admin-container {
+    width: 100%;
+    height: 100vh;
+    position: relative;
+    padding: 0;
+}
+
+.admin-container header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 50px;
+    z-index: 1000;
+}
+
+.admin-container main {
+    position: fixed;
+    top: 50px;
+    left: 0;
+    right: 0;
+    bottom: 50px;
+    overflow: hidden;
+    padding: 10px;
+}
+
+.admin-container footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 50px;
+    z-index: 1000;
+}
+
+.admin-main-content {
+    display: flex;
+    gap: 10px;
+    height: 100%;
+    overflow: hidden;
+}
+
+.admin-selector-card {
+    width: 300px;
+    background: #fff;
+    border: 2px solid #000;
+    padding: 15px;
+    overflow-y: auto;
+    position: fixed;
+    left: 10px;
+    top: 60px;
+    bottom: 60px;
+}
+
+.admin-selector-card h2,
+.admin-selector-card h4 {
+    font-size: 14px;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+.admin-selector-card .form-group {
+    margin-bottom: 10px;
+}
+
+.admin-selector-card .form-group label {
+    font-size: 12px;
+}
+
+.option-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-top: 5px;
+}
+
+.option-btn {
+    padding: 8px;
+    background: #e0e0e0;
+    color: #000;
+    border: 1px solid #000;
+    font-size: 12px;
+    cursor: pointer;
+    text-align: left;
+}
+
+.option-btn:hover {
+    background: #d0d0d0;
+}
+
+.option-btn.active {
+    background: #333;
+    color: #fff;
+}
+
+.tabs-container {
+    margin-left: 320px;
+    background: #fff;
+    border: 2px solid #000;
+    padding: 15px;
+    overflow-y: auto;
+    position: fixed;
+    left: 320px;
+    right: 10px;
+    top: 60px;
+    bottom: 60px;
+}
+
+.tabs-container h3 {
+    font-size: 14px;
+    margin-bottom: 15px;
+    font-weight: bold;
+}
+
+.tab-buttons {
+    display: flex;
+    gap: 5px;
+    margin-bottom: 15px;
+    border-bottom: 2px solid #000;
+}
+
+.tab-btn {
+    padding: 8px 15px;
+    background: #e0e0e0;
+    color: #000;
+    border: 1px solid #000;
+    border-bottom: none;
+    font-size: 12px;
+    cursor: pointer;
+    font-weight: normal;
+}
+
+.tab-btn.active {
+    background: grey;
+    color: #fff;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.show {
+    display: block;
+}
+
+.table-container {
+    overflow-x: auto;
+    overflow-y: auto;
+    max-height: calc(100vh - 300px);
+    border: 1px solid #000;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+}
+
+.data-table th {
+    background: #333;
+    color: #fff;
+    padding: 8px;
+    text-align: left;
+    font-size: 12px;
+    font-weight: bold;
+    border: 1px solid #000;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.data-table td {
+    padding: 8px;
+    border: 1px solid #000;
+    font-size: 12px;
+}
+
+.data-table input,
+.data-table select {
+    width: 100%;
+    padding: 5px;
+    border: 1px solid #000;
+    background: #fff;
+    color: #000;
+    font-size: 12px;
+}
+
+.btn-action {
+    padding: 5px 10px;
+    margin: 2px;
+    background: #e0e0e0;
+    color: #000;
+    border: 1px solid #000;
+    font-size: 11px;
+    cursor: pointer;
+    font-weight: normal;
+}
+
+.btn-action:hover {
+    background: #d0d0d0;
+}
+
+.btn-action.btn-delete {
+    background: #f8d7da;
+}
+
+.btn-action.btn-delete:hover {
+    background: #f5c6cb;
+}
+
+.btn-action.btn-save,
+.btn-action.btn-edit {
+    background: #d4edda;
+}
+
+.btn-action.btn-save:hover,
+.btn-action.btn-edit:hover {
+    background: #c3e6cb;
+}
+
+.btn-add {
+    margin-top: 10px;
+    width: auto;
+    padding: 8px 15px;
+}
+
+.move-buttons-cell {
+    text-align: center;
+}
+
+.btn-move-up,
+.btn-move-down {
+    padding: 3px 8px;
+    margin: 2px;
+    font-size: 12px;
+}
+
+.back-link {
+    color: #fff;
+    text-decoration: underline;
+    font-size: 12px;
+    padding: 5px 10px;
+    background: #555;
+    border: 1px solid #000;
+}
+
+.back-link:hover {
+    background: #666;
+}

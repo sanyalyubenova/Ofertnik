@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Администратор - Управление на тарифи</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="admin.css">
+</head>
+<body class="admin-page">
+    <div class="container admin-container">
+        <header>
+            <h1>Администратор</h1>
+            <p class="subtitle">Управление на тарифи</p>
+            <a href="/" class="back-link">← Обратно към калкулатора</a>
+        </header>
+
+        <main class="admin-main-content">
+            <!-- Insurer and Insurance Type Selection -->
+            <div class="card admin-selector-card">
+                <h4>Избор на застраховател</h4>
+                <div class="selector-column">
+                    <div class="form-group">
+                        <label>Застраховател</label>
+                        <div class="option-buttons" id="insurer-buttons">
+                            <button type="button" class="option-btn" data-value="generali">Дженерали</button>
+                            <button type="button" class="option-btn" data-value="armeec">Армеец</button>
+                            <button type="button" class="option-btn" data-value="bulstrad">Булстрад</button>
+                            <button type="button" class="option-btn" data-value="dzi">ДЗИ</button>
+                            <button type="button" class="option-btn" data-value="unika">Уника</button>
+                            <button type="button" class="option-btn" data-value="grupama">Групама</button>
+                            <button type="button" class="option-btn" data-value="bul-ins">Бул Инс</button>
+                            <button type="button" class="option-btn" data-value="allianz">Алианц</button>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group" id="insurance-type-group">
+                        <label>Избор на застраховка</label>
+                        <div class="option-buttons" id="insurance-type-buttons">
+                            <button type="button" class="option-btn" data-value="casco">Каско</button>
+                            <button type="button" class="option-btn" data-value="mtpl">Гражданска отговорност</button>
+                            <button type="button" class="option-btn" data-value="gap" id="gap-option-btn">GAP</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabs -->
+            <div class="card tabs-container">
+                <h3 id="tariff-edit-title" class="tariff-edit-title">Редактиране на тарифа за <span id="insurance-type-name"></span> на <span id="insurer-name"></span></h3>
+                <div class="tabs">
+                    <button class="tab-btn active" data-tab="tariffs">Основни тарифи</button>
+                    <button class="tab-btn" data-tab="discounts">Отстъпки</button>
+                    <button class="tab-btn" data-tab="surcharges">Надбавки</button>
+                </div>
+
+                <!-- Tab Content: Основни тарифи -->
+                <div class="tab-content active" id="tariffs-tab">
+                    <div class="tab-header">
+                        <h3>Основни тарифни числа</h3>
+                    </div>
+                    <div class="table-container">
+                        <div class="table-scroll-wrapper">
+                            <table class="data-table" id="tariffs-table">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 60px;"></th>
+                                        <th>Възраст на автомобила (от)</th>
+                                        <th>Възраст на автомобила (до)</th>
+                                        <th>Застрахователна сума от (€)</th>
+                                        <th>Застрахователна сума до (€)</th>
+                                        <th>Тарифен процент (%)</th>
+                                        <th>Действия</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tariffs-tbody">
+                                    <!-- Rows will be added dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <button class="btn btn-add" id="add-tariff-row">+ Добави ред</button>
+                    </div>
+                </div>
+
+                <!-- Tab Content: Отстъпки -->
+                <div class="tab-content" id="discounts-tab">
+                    <div class="tab-header">
+                        <h3>Отстъпки</h3>
+                    </div>
+                    <div class="table-container">
+                        <div class="table-scroll-wrapper">
+                            <table class="data-table" id="discounts-table">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 60px;"></th>
+                                        <th>Тип отстъпка</th>
+                                        <th>Стойност (%)</th>
+                                        <th>Действия</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="discounts-tbody">
+                                    <!-- Rows will be added dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <button class="btn btn-add" id="add-discount-row">+ Добави ред</button>
+                    </div>
+                </div>
+
+                <!-- Tab Content: Надбавки -->
+                <div class="tab-content" id="surcharges-tab">
+                    <div class="tab-header">
+                        <h3>Надбавки</h3>
+                    </div>
+                    <div class="table-container">
+                        <div class="table-scroll-wrapper">
+                            <table class="data-table" id="surcharges-table">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 60px;"></th>
+                                        <th>Тип надбавка</th>
+                                        <th>Условие</th>
+                                        <th>Стойност (%)</th>
+                                        <th>Действия</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="surcharges-tbody">
+                                    <!-- Rows will be added dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <button class="btn btn-add" id="add-surcharge-row">+ Добави ред</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>Административен панел - Офертник</p>
+        </footer>
+    </div>
+
+    <script src="admin.js"></script>
+</body>
+</html>
+

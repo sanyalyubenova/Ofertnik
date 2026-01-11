@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Офертник - Калкулатор за застраховки</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="main-page">
+    <div class="container">
+        <header>
+            <h1>Офертник</h1>
+            <p class="subtitle">Калкулатор за застраховки - Каско, Гражданска отговорност, GAP</p>
+            <a href="/admin" class="admin-link">Администратор</a>
+        </header>
+
+        <main>
+            <!-- Insurance Type Selector -->
+            <div class="card selector-card">
+                <h2>Изготвяне на оферта за:</h2>
+                <div class="insurance-types">
+                    <button class="insurance-btn" data-type="casco">Каско</button>
+                    <button class="insurance-btn" data-type="mtpl">Гражданска отговорност</button>
+                    <button class="insurance-btn" data-type="gap">GAP</button>
+                </div>
+            </div>
+
+            <!-- Main Data Card -->
+            <div class="card common-data-card">
+                <h2>Основни данни</h2>
+                <form id="common-data-form">
+                    <div class="form-group">
+                        <label for="registration-number">Регистрационен номер / Рама</label>
+                        <input type="text" id="registration-number" name="registrationNumber" placeholder="Незадължително поле">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="vehicle-brand">Марка <span class="required">*</span></label>
+                        <select id="vehicle-brand" name="vehicleBrand" required>
+                            <option value="Hyundai" selected>Hyundai</option>
+                            <option value="Volkswagen">Volkswagen</option>
+                            <option value="Toyota">Toyota</option>
+                            <option value="Ford">Ford</option>
+                            <option value="Opel">Opel</option>
+                            <option value="Renault">Renault</option>
+                            <option value="Peugeot">Peugeot</option>
+                            <option value="Citroen">Citroen</option>
+                            <option value="BMW">BMW</option>
+                            <option value="Mercedes-Benz">Mercedes-Benz</option>
+                            <option value="Audi">Audi</option>
+                            <option value="Skoda">Skoda</option>
+                            <option value="Seat">Seat</option>
+                            <option value="Fiat">Fiat</option>
+                            <option value="Nissan">Nissan</option>
+                            <option value="Kia">Kia</option>
+                            <option value="Mazda">Mazda</option>
+                            <option value="Suzuki">Suzuki</option>
+                            <option value="Dacia">Dacia</option>
+                            <option value="other">Друга марка</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group" id="other-brand-group" style="display: none;">
+                        <label for="other-brand-name">Въведете марка <span class="required">*</span></label>
+                        <input type="text" id="other-brand-name" name="otherBrandName" placeholder="Име на марката">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="vehicle-model">Модел <span class="required">*</span></label>
+                        <select id="vehicle-model" name="vehicleModel" required>
+                            <!-- Hyundai models will be loaded dynamically -->
+                        </select>
+                        <input type="text" id="vehicle-model-manual" name="vehicleModelManual" placeholder="Въведете модел ръчно" style="display: none;">
+                        <input type="text" id="vehicle-model-other" name="vehicleModelOther" placeholder="Въведете модел ръчно" style="display: none;">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="first-registration-date">Дата първа регистрация <span class="required">*</span></label>
+                        <input type="text" id="first-registration-date" name="firstRegistrationDate" required placeholder="dd/mm/yyyy" maxlength="10">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="owner-name">Собственик (три имена) <span class="required">*</span></label>
+                        <input type="text" id="owner-name" name="ownerName" required placeholder="Име Презиме Фамилия">
+                    </div>
+
+                    <div class="form-group">
+                        <label>ЕГН или рожден ден <span class="required">*</span></label>
+                        <div class="input-type-selector">
+                            <button type="button" class="input-type-btn active" data-type="egn">ЕГН</button>
+                            <button type="button" class="input-type-btn" data-type="birthdate">Рожден ден</button>
+                        </div>
+                        <input type="text" id="egn-input" name="egn" placeholder="ЕГН (10 цифри)" required>
+                        <input type="text" id="birthdate-input" name="birthdate" placeholder="dd/mm/yyyy" maxlength="10" style="display: none;">
+                        <div id="age-display" class="age-display"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="address-region">Адресна регистрация - Област <span class="required">*</span></label>
+                        <select id="address-region" name="addressRegion" required>
+                            <option value="">Изберете област</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="address-municipality">Адресна регистрация - Община <span class="required">*</span></label>
+                        <select id="address-municipality" name="addressMunicipality" required disabled>
+                            <option value="">Първо изберете област</option>
+                        </select>
+                    </div>
+
+
+                    <!-- MTPL Fields -->
+                    <div class="insurance-fields" id="mtpl-fields" style="display: none;">
+                        <h3>Данни за ГО (MTPL)</h3>
+                        <div class="form-group">
+                            <label for="mtpl-engine-size">Обем двигател (cm³) <span class="required">*</span></label>
+                            <input type="number" id="mtpl-engine-size" name="engineSize" min="0" step="1" placeholder="Например: 1598">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="mtpl-power">kW / к.с. <span class="required">*</span></label>
+                            <div class="power-input-group">
+                                <input type="number" id="mtpl-power-kw" name="powerKW" placeholder="kW" min="0" step="0.01">
+                                <span class="power-separator">или</span>
+                                <input type="number" id="mtpl-power-hp" name="powerHP" placeholder="к.с." min="0" step="0.01">
+                            </div>
+                            <small class="form-hint">1 к.с. = 1.36 kW</small>
+                        </div>
+                    </div>
+
+                    <!-- GAP Fields -->
+                    <div class="insurance-fields" id="gap-fields" style="display: none;">
+                        <h3>Данни за GAP</h3>
+                        <div class="form-group">
+                            <label for="gap-insurance-sum">Застрахователна сума (€) <span class="required">*</span></label>
+                            <input type="number" id="gap-insurance-sum" name="insuranceSum" min="0" step="0.01">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="gap-registration-date">Дата първа регистрация <span class="required">*</span></label>
+                            <input type="text" id="gap-registration-date" name="registrationDate" placeholder="dd/mm/yyyy" maxlength="10">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="gap-casco-insurer">Каско полица в: <span class="required">*</span></label>
+                            <select id="gap-casco-insurer" name="cascoInsurer">
+                                <option value="">Изберете застраховател</option>
+                                <option value="bulstrad">Булстрад</option>
+                                <option value="other">Друг застраховател</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button type="button" class="btn calculate-btn" id="calculate-premium-btn" style="display: none;">Изчисли оферта</button>
+                    <button type="button" class="btn" id="clear-form-btn" style="margin-left: 10px; background-color: #dc3545;">Изчисти</button>
+                </form>
+                <div class="result" id="premium-result"></div>
+            </div>
+
+        </main>
+
+        <footer>
+            <p>Калкулатор за застраховки - Офертник | <code>http://localhost:3000</code></p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

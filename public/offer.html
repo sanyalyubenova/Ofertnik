@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Оферти - Калкулатор за застраховки</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="offer.css">
+</head>
+<body class="offer-page">
+    <div class="container">
+        <header>
+            <h1>Оферти</h1>
+            <a href="/" class="admin-link">← Назад към калкулатора</a>
+        </header>
+
+        <main>
+            <div class="card">
+                <div class="offer-number-section">
+                    <label for="offer-number">Номер на оферта:</label>
+                    <input type="text" id="offer-number" placeholder="Въведете номер на оферта">
+                </div>
+                <div id="offers-container">
+                    <p>Зареждане...</p>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>Калкулатор за застраховки - Офертник | <code>http://localhost:3000</code></p>
+        </footer>
+    </div>
+
+    <script src="offer.js"></script>
+</body>
+</html>
+

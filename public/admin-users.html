@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Управление на потребители - Офертник</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="admin.css">
+    <style>
+        .users-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .btn-add-user {
+            background: var(--primary-color, #007bff);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        .btn-add-user:hover {
+            background: var(--primary-hover, #0056b3);
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            margin-bottom: 20px;
+        }
+        
+        .modal-header h2 {
+            margin: 0;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        .btn-primary {
+            background: var(--primary-color, #007bff);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: var(--primary-hover, #0056b3);
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+        
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #c82333;
+        }
+        
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 12px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .error-message.show {
+            display: block;
+        }
+        
+        .nav-links {
+            margin-bottom: 20px;
+        }
+        
+        .nav-links a {
+            margin-right: 20px;
+            color: var(--primary-color, #007bff);
+            text-decoration: none;
+        }
+        
+        .nav-links a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="users-container">
+        <div class="nav-links">
+            <a href="/admin">Тарифи</a>
+            <a href="/admin-users">Потребители</a>
+            <span id="username-display" style="margin-right: 20px; color: var(--primary-color, #007bff);"></span>
+            <a href="/" onclick="event.preventDefault(); logout();">Изход</a>
+        </div>
+        
+        <div class="header-actions">
+            <h1>Управление на потребители</h1>
+            <button class="btn-add-user" onclick="showAddUserModal()">Добави потребител</button>
+        </div>
+        
+        <div class="error-message" id="errorMessage"></div>
+        
+        <div class="table-scroll-wrapper">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Потребителско име</th>
+                        <th>Имейл</th>
+                        <th>Роля</th>
+                        <th>Създаден на</th>
+                        <th>Действия</th>
+                    </tr>
+                </thead>
+                <tbody id="usersTableBody">
+                    <!-- Users will be loaded here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- Add/Edit User Modal -->
+    <div id="userModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Добави потребител</h2>
+            </div>
+            <form id="userForm">
+                <div class="form-group">
+                    <label for="modalUsername">Потребителско име:</label>
+                    <input type="text" id="modalUsername" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="modalEmail">Имейл (опционално):</label>
+                    <input type="email" id="modalEmail" name="email">
+                </div>
+                <div class="form-group">
+                    <label for="modalPassword">Парола:</label>
+                    <input type="password" id="modalPassword" name="password" required>
+                </div>
+                <div class="form-group">
+                    <label for="modalRole">Роля:</label>
+                    <select id="modalRole" name="role">
+                        <option value="user">Потребител</option>
+                        <option value="admin">Администратор</option>
+                    </select>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeUserModal()">Отказ</button>
+                    <button type="submit" class="btn btn-primary">Запази</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        let currentUserId = null;
+        
+        async function loadUsers() {
+            try {
+                const response = await fetch('/api/admin/users');
+                if (!response.ok) {
+                    if (response.status === 401 || response.status === 403) {
+                        window.location.href = '/login';
+                        return;
+                    }
+                    throw new Error('Failed to load users');
+                }
+                const users = await response.json();
+                renderUsers(users);
+            } catch (error) {
+                console.error('Error loading users:', error);
+                showError('Грешка при зареждане на потребители');
+            }
+        }
+        
+        function renderUsers(users) {
+            const tbody = document.getElementById('usersTableBody');
+            tbody.innerHTML = '';
+            
+            users.forEach(user => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${user.id}</td>
+                    <td>${escapeHtml(user.username)}</td>
+                    <td>${escapeHtml(user.email || '-')}</td>
+                    <td>${user.role === 'admin' ? 'Администратор' : 'Потребител'}</td>
+                    <td>${new Date(user.created_at).toLocaleDateString('bg-BG')}</td>
+                    <td>
+                        <button class="btn btn-danger" onclick="deleteUser(${user.id})">Изтрий</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+        
+        function showAddUserModal() {
+            currentUserId = null;
+            document.getElementById('modalTitle').textContent = 'Добави потребител';
+            document.getElementById('userForm').reset();
+            document.getElementById('userModal').classList.add('show');
+        }
+        
+        function closeUserModal() {
+            document.getElementById('userModal').classList.remove('show');
+            document.getElementById('userForm').reset();
+            currentUserId = null;
+        }
+        
+        document.getElementById('userForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const username = document.getElementById('modalUsername').value;
+            const email = document.getElementById('modalEmail').value;
+            const password = document.getElementById('modalPassword').value;
+            const role = document.getElementById('modalRole').value;
+            
+            try {
+                const response = await fetch('/api/admin/users', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, email, password, role })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    closeUserModal();
+                    loadUsers();
+                } else {
+                    showError(data.error || 'Грешка при създаване на потребител');
+                }
+            } catch (error) {
+                console.error('Error creating user:', error);
+                showError('Грешка при създаване на потребител');
+            }
+        });
+        
+        async function deleteUser(userId) {
+            if (!confirm('Сигурни ли сте, че искате да изтриете този потребител?')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/admin/users/${userId}`, {
+                    method: 'DELETE'
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    loadUsers();
+                } else {
+                    showError(data.error || 'Грешка при изтриване на потребител');
+                }
+            } catch (error) {
+                console.error('Error deleting user:', error);
+                showError('Грешка при изтриване на потребител');
+            }
+        }
+        
+        async function logout() {
+            try {
+                await fetch('/api/logout', { method: 'POST' });
+                window.location.href = '/login';
+            } catch (error) {
+                console.error('Error logging out:', error);
+                window.location.href = '/login';
+            }
+        }
+        
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message;
+            errorDiv.classList.add('show');
+            setTimeout(() => {
+                errorDiv.classList.remove('show');
+            }, 5000);
+        }
+        
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        // Close modal when clicking outside
+        document.getElementById('userModal').addEventListener('click', (e) => {
+            if (e.target.id === 'userModal') {
+                closeUserModal();
+            }
+        });
+        
+        // Display username on page load
+        async function displayUsername() {
+            try {
+                const response = await fetch('/api/me');
+                if (response.ok) {
+                    const user = await response.json();
+                    const usernameDisplay = document.getElementById('username-display');
+                    if (usernameDisplay && user.username) {
+                        usernameDisplay.textContent = user.username;
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading username:', error);
+            }
+        }
+        
+        // Load users on page load
+        displayUsername();
+        loadUsers();
+    </script>
+</body>
+</html>
+

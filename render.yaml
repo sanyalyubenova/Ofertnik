@@ -1,0 +1,20 @@
+# Render Blueprint - Опционална конфигурация
+# Този файл може да се използва за автоматично създаване на Web Service
+# Или можеш да създадеш Web Service ръчно в Render Dashboard
+
+services:
+  - type: web
+    name: ofertnik
+    env: node
+    region: frankfurt  # EU регион (близо до България)
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false  # Трябва да се зададе ръчно в Render Dashboard
+      - key: SESSION_SECRET
+        sync: false  # Трябва да се зададе ръчно в Render Dashboard (генерирай нов secret!)
+

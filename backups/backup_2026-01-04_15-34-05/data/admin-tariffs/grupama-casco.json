@@ -1,0 +1,113 @@
+{
+  "tariffs": [
+    {
+      "fromAge": 0,
+      "toAge": 3,
+      "fromValue": null,
+      "toValue": 26000,
+      "rate": 5.5
+    },
+    {
+      "fromAge": 0,
+      "toAge": 3,
+      "fromValue": 26000,
+      "toValue": 51000,
+      "rate": 5.3
+    },
+    {
+      "fromAge": 0,
+      "toAge": 3,
+      "fromValue": 51000,
+      "toValue": null,
+      "rate": 5.0
+    },
+    {
+      "fromAge": 3,
+      "toAge": 5,
+      "fromValue": null,
+      "toValue": 21000,
+      "rate": 6.2
+    },
+    {
+      "fromAge": 3,
+      "toAge": 5,
+      "fromValue": 21000,
+      "toValue": 43000,
+      "rate": 5.9
+    },
+    {
+      "fromAge": 3,
+      "toAge": 5,
+      "fromValue": 43000,
+      "toValue": null,
+      "rate": 5.6
+    },
+    {
+      "fromAge": 5,
+      "toAge": 8,
+      "fromValue": null,
+      "toValue": 11000,
+      "rate": 6.9
+    },
+    {
+      "fromAge": 5,
+      "toAge": 8,
+      "fromValue": 11000,
+      "toValue": 26000,
+      "rate": 6.6
+    },
+    {
+      "fromAge": 5,
+      "toAge": 8,
+      "fromValue": 26000,
+      "toValue": null,
+      "rate": 6.3
+    },
+    {
+      "fromAge": 8,
+      "toAge": null,
+      "fromValue": null,
+      "toValue": 8500,
+      "rate": 8.4
+    },
+    {
+      "fromAge": 8,
+      "toAge": null,
+      "fromValue": 8500,
+      "toValue": 17500,
+      "rate": 7.9
+    },
+    {
+      "fromAge": 8,
+      "toAge": null,
+      "fromValue": 17500,
+      "toValue": null,
+      "rate": 7.3
+    }
+  ],
+  "discounts": [
+    {
+      "type": "go",
+      "value": 11
+    },
+    {
+      "type": "new",
+      "value": 6
+    },
+    {
+      "type": "combined",
+      "value": 5
+    }
+  ],
+  "surcharges": [
+    {
+      "type": "age_under_25",
+      "value": 65
+    },
+    {
+      "type": "risk_model",
+      "value": 55
+    }
+  ]
+}
+
