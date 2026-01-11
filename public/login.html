@@ -119,9 +119,11 @@
                 console.log('Form submit event triggered!');
                 e.preventDefault();
                 e.stopPropagation();
+                console.log('Prevent default called');
             
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
+            console.log('Username:', username);
             const loginBtn = document.getElementById('loginBtn');
             const errorMessage = document.getElementById('errorMessage');
             
@@ -134,6 +136,7 @@
             loginBtn.textContent = 'Влизане...';
             
             try {
+                console.log('Making fetch request to /api/login');
                 const response = await fetch('/api/login', {
                     method: 'POST',
                     headers: {
@@ -141,11 +144,14 @@
                     },
                     body: JSON.stringify({ username, password })
                 });
+                console.log('Response received:', response.status);
                 
                 let data;
                 try {
                     data = await response.json();
+                    console.log('Response data:', data);
                 } catch (jsonError) {
+                    console.error('JSON parse error:', jsonError);
                     // If response is not JSON, show generic error
                     errorMessage.textContent = 'Грешка при свързване със сървъра';
                     errorMessage.classList.add('show');
@@ -155,9 +161,11 @@
                 }
                 
                 if (response.ok) {
+                    console.log('Login successful, redirecting...');
                     // Redirect to home page
                     window.location.href = '/';
                 } else {
+                    console.log('Login failed:', data.error);
                     // Show error message from server
                     errorMessage.textContent = data.error || 'Грешка при вход';
                     errorMessage.classList.add('show');
