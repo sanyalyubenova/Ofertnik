@@ -10,17 +10,26 @@ const path = require('path');
 const fs = require('fs-extra');
 const multer = require('multer');
 const session = require('express-session');
+const pgSession = require('connect-pg-simple')(session);
+const { Pool } = require('pg');
 
 // Database connection (optional - uses file system if DATABASE_URL is not set)
 let db = null;
 let dbQueries = null;
 let authQueries = null;
+let sessionPool = null;
 if (process.env.DATABASE_URL) {
     try {
         db = require('./db/connection');
         dbQueries = require('./db/queries');
         authQueries = require('./db/auth-queries');
         console.log('📦 Using Neon PostgreSQL database');
+        
+        // Create pool for sessions
+        sessionPool = new Pool({
+            connectionString: process.env.DATABASE_URL,
+            ssl: process.env.DATABASE_URL.includes('sslmode=require') ? { rejectUnauthorized: false } : false
+        });
     } catch (error) {
         console.warn('⚠️ Database connection failed, using file system:', error.message);
     }
@@ -34,7 +43,7 @@ const CASCO_TARIFFS_DIR = process.env.CASCO_TARIFFS_DIR || path.join(__dirname, 
 const MTPL_TARIFFS_DIR = process.env.MTPL_TARIFFS_DIR || path.join(__dirname, 'data', 'admin-tariffs');
 
 // Session configuration
-app.use(session({
+const sessionConfig = {
     secret: process.env.SESSION_SECRET || 'ofertnik-secret-key-change-in-production',
     resave: false,
     saveUninitialized: false,
@@ -43,7 +52,21 @@ app.use(session({
         httpOnly: true,
         maxAge: 24 * 60 * 60 * 1000 // 24 hours
     }
-}));
+};
+
+// Use PostgreSQL session store if database is available
+if (sessionPool) {
+    sessionConfig.store = new pgSession({
+        pool: sessionPool,
+        tableName: 'session', // Optional: customize table name
+        createTableIfMissing: true // Automatically create table if it doesn't exist
+    });
+    console.log('✅ Using PostgreSQL session store');
+} else {
+    console.warn('⚠️ Using MemoryStore for sessions (not recommended for production)');
+}
+
+app.use(session(sessionConfig));
 
 // Middleware
 app.use(express.json());
