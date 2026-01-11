@@ -88,7 +88,7 @@
         
         <div class="error-message" id="errorMessage"></div>
         
-        <form id="loginForm">
+        <form id="loginForm" action="#" method="post">
             <div class="form-group">
                 <label for="username">Потребителско име:</label>
                 <input type="text" id="username" name="username" required autofocus>
@@ -104,15 +104,19 @@
     </div>
     
     <script>
+        console.log('Login script loading...');
         // Wait for DOM to be ready
         (function() {
+            console.log('Login script executing...');
             const loginForm = document.getElementById('loginForm');
             if (!loginForm) {
                 console.error('Login form not found!');
                 return;
             }
+            console.log('Login form found, adding event listener...');
             
             loginForm.addEventListener('submit', async function(e) {
+                console.log('Form submit event triggered!');
                 e.preventDefault();
                 e.stopPropagation();
             
