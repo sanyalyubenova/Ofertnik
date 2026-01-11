@@ -51,7 +51,7 @@ const sessionConfig = {
         secure: process.env.NODE_ENV === 'production', // HTTPS only in production
         httpOnly: true,
         maxAge: 24 * 60 * 60 * 1000, // 24 hours
-        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax' // Required for cross-site cookies on Render
+        sameSite: 'lax' // Use 'lax' for same-site cookies (Render serves from same domain)
     }
 };
 
