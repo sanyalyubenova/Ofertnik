@@ -40,7 +40,7 @@ git branch -M main
 
 # Качи кода в GitHub
 git push -u origin main
-```
+```git 
 
 **Важно:** Замени `USERNAME` и `REPO_NAME` с твоето GitHub потребителско име и името на repository-то!
 
