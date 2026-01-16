@@ -17,12 +17,14 @@ const { Pool } = require('pg');
 let db = null;
 let dbQueries = null;
 let authQueries = null;
+let offersQueries = null;
 let sessionPool = null;
 if (process.env.DATABASE_URL) {
     try {
         db = require('./db/connection');
         dbQueries = require('./db/queries');
         authQueries = require('./db/auth-queries');
+        offersQueries = require('./db/offers-queries');
         console.log('📦 Using Neon PostgreSQL database');
         
         // Create pool for sessions
@@ -356,11 +358,11 @@ app.post('/api/compare', (req, res) => {
       'armeec': 'Армеец',
       'bulstrad': 'Булстрад',
       'dzi': 'ДЗИ',
-      'unika': 'Уника',
-      'grupama': 'Групама',
-      'bul-ins': 'Бул Инс',
-      'allianz': 'Алианц'
+      'bul-ins': 'Бул Инс'
     };
+    
+    // Exclude these insurers from comparison
+    const excludedInsurers = ['unika', 'grupama', 'allianz'];
 
     const results = [];
     
@@ -373,6 +375,12 @@ app.post('/api/compare', (req, res) => {
         const match = file.match(pattern);
         if (match) {
           const insurer = match[1];
+          
+          // Skip excluded insurers
+          if (excludedInsurers.includes(insurer)) {
+            continue;
+          }
+          
           const insurerFile = path.join(adminTariffsDir, file);
           
           try {
@@ -822,6 +830,163 @@ app.delete('/api/admin/users/:id', requireAuth, requireAdmin, async (req, res) =
   }
 });
 
+// Offers API endpoints
+// GET /api/offers - Get all offers (for dashboard)
+app.get('/api/offers', requireAuth, async (req, res) => {
+  try {
+    if (!offersQueries) {
+      return res.status(503).json({ error: 'Offers not available - database not connected' });
+    }
+    
+    const limit = parseInt(req.query.limit) || 50;
+    const offers = await offersQueries.getAllOffers(limit);
+    res.json(offers);
+  } catch (error) {
+    console.error('Get offers error:', error);
+    res.status(500).json({ error: 'Failed to get offers' });
+  }
+});
+
+// GET /api/offers/my - Get current user's offers
+app.get('/api/offers/my', requireAuth, async (req, res) => {
+  try {
+    if (!offersQueries) {
+      return res.status(503).json({ error: 'Offers not available - database not connected' });
+    }
+    
+    const offers = await offersQueries.getUserOffers(req.session.userId);
+    res.json(offers);
+  } catch (error) {
+    console.error('Get user offers error:', error);
+    res.status(500).json({ error: 'Failed to get user offers' });
+  }
+});
+
+// GET /api/offers/:id - Get a specific offer
+app.get('/api/offers/:id', requireAuth, async (req, res) => {
+  try {
+    if (!offersQueries) {
+      return res.status(503).json({ error: 'Offers not available - database not connected' });
+    }
+    
+    const offerId = parseInt(req.params.id);
+    const offer = await offersQueries.getOfferById(offerId);
+    
+    if (!offer) {
+      return res.status(404).json({ error: 'Offer not found' });
+    }
+    
+    res.json(offer);
+  } catch (error) {
+    console.error('Get offer error:', error);
+    res.status(500).json({ error: 'Failed to get offer' });
+  }
+});
+
+// POST /api/offers - Create a new offer
+app.post('/api/offers', requireAuth, async (req, res) => {
+  try {
+    if (!offersQueries) {
+      return res.status(503).json({ error: 'Offers not available - database not connected' });
+    }
+    
+    const { offerNumber, commonData, offersData, insuranceTypes, title } = req.body;
+    
+    if (!commonData || !offersData || !insuranceTypes) {
+      return res.status(400).json({ error: 'Missing required fields: commonData, offersData, insuranceTypes' });
+    }
+    
+    const offer = await offersQueries.createOffer(req.session.userId, {
+      offerNumber,
+      commonData,
+      offersData,
+      insuranceTypes,
+      title
+    });
+    
+    res.status(201).json(offer);
+  } catch (error) {
+    console.error('Create offer error:', error);
+    res.status(500).json({ error: 'Failed to create offer' });
+  }
+});
+
+// PUT /api/offers/:id - Update an offer
+app.put('/api/offers/:id', requireAuth, async (req, res) => {
+  try {
+    if (!offersQueries) {
+      return res.status(503).json({ error: 'Offers not available - database not connected' });
+    }
+    
+    const offerId = parseInt(req.params.id);
+    
+    // First check if offer exists and belongs to user
+    const existingOffer = await offersQueries.getOfferById(offerId);
+    if (!existingOffer) {
+      return res.status(404).json({ error: 'Offer not found' });
+    }
+    
+    if (existingOffer.user_id !== req.session.userId) {
+      return res.status(403).json({ error: 'Not authorized to update this offer' });
+    }
+    
+    const { offerNumber, commonData, offersData, insuranceTypes, title } = req.body;
+    
+    if (!commonData || !offersData || !insuranceTypes) {
+      return res.status(400).json({ error: 'Missing required fields: commonData, offersData, insuranceTypes' });
+    }
+    
+    const offer = await offersQueries.updateOffer(offerId, req.session.userId, {
+      offerNumber,
+      commonData,
+      offersData,
+      insuranceTypes,
+      title
+    });
+    
+    if (!offer) {
+      return res.status(404).json({ error: 'Offer not found' });
+    }
+    
+    res.json(offer);
+  } catch (error) {
+    console.error('Update offer error:', error);
+    res.status(500).json({ error: 'Failed to update offer' });
+  }
+});
+
+// DELETE /api/offers/:id - Delete an offer
+app.delete('/api/offers/:id', requireAuth, async (req, res) => {
+  try {
+    if (!offersQueries) {
+      return res.status(503).json({ error: 'Offers not available - database not connected' });
+    }
+    
+    const offerId = parseInt(req.params.id);
+    
+    // First check if offer exists and belongs to user
+    const existingOffer = await offersQueries.getOfferById(offerId);
+    if (!existingOffer) {
+      return res.status(404).json({ error: 'Offer not found' });
+    }
+    
+    if (existingOffer.user_id !== req.session.userId) {
+      return res.status(403).json({ error: 'Not authorized to delete this offer' });
+    }
+    
+    const deleted = await offersQueries.deleteOffer(offerId, req.session.userId);
+    
+    if (!deleted) {
+      return res.status(404).json({ error: 'Offer not found' });
+    }
+    
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Delete offer error:', error);
+    res.status(500).json({ error: 'Failed to delete offer' });
+  }
+});
+
 // Route for admin page (requires authentication)
 app.get('/admin', redirectToLogin, (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'admin.html'));
@@ -849,11 +1014,11 @@ app.get('/api/casco-insurers', (req, res) => {
       'armeec': 'Армеец',
       'bulstrad': 'Булстрад',
       'dzi': 'ДЗИ',
-      'unika': 'Уника',
-      'grupama': 'Групама',
-      'bul-ins': 'Бул Инс',
-      'allianz': 'Алианц'
+      'bul-ins': 'Бул Инс'
     };
+    
+    // Exclude these insurers from comparison
+    const excludedInsurers = ['unika', 'grupama', 'allianz'];
 
     const insurers = [];
     
@@ -865,6 +1030,12 @@ app.get('/api/casco-insurers', (req, res) => {
         const match = file.match(pattern);
         if (match) {
           const insurer = match[1];
+          
+          // Skip excluded insurers
+          if (excludedInsurers.includes(insurer)) {
+            continue;
+          }
+          
           const insurerFile = path.join(adminTariffsDir, file);
           
           try {
@@ -894,8 +1065,13 @@ app.get('/api/casco-insurers', (req, res) => {
 });
 
 // Route for offer page
-app.get('/offer', (req, res) => {
+app.get('/offer', redirectToLogin, (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'offer.html'));
+});
+
+// Route for "My Offers" page (requires authentication)
+app.get('/my-offers', redirectToLogin, (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'my-offers.html'));
 });
 
 // Word Document Export endpoint

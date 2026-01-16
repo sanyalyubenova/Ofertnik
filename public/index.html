@@ -78,6 +78,7 @@
             <h1>Офертник</h1>
             <p class="subtitle">Калкулатор за застраховки - Каско, Гражданска отговорност, GAP</p>
             <div style="display: flex; gap: 15px; align-items: center;">
+                <a href="/my-offers" class="admin-link">Моите оферти</a>
                 <a href="/admin" class="admin-link" id="admin-link" style="display: none;">Администратор</a>
                 <span id="username-display" style="color: #fff; font-size: 12px;"></span>
                 <a href="#" onclick="event.preventDefault(); logout();" class="admin-link">Изход</a>
@@ -85,6 +86,14 @@
         </header>
 
         <main>
+            <!-- Dashboard Section -->
+            <div class="card" id="dashboard-section" style="margin-bottom: 20px; display: none;">
+                <h2>Последни оферти</h2>
+                <div id="dashboard-offers">
+                    <p>Зареждане...</p>
+                </div>
+            </div>
+
             <!-- Insurance Type Selector -->
             <div class="card selector-card">
                 <h2>Изготвяне на оферта за:</h2>
@@ -253,6 +262,7 @@
 
     <script src="bulgarian-cities.js"></script>
     <script src="script.js"></script>
+    <script src="dashboard.js"></script>
     <script>
         // Check authentication on page load and redirect to login if not authenticated
         (async function() {
@@ -276,6 +286,11 @@
                 // Show admin link if admin
                 if (user.role === 'admin') {
                     document.getElementById('admin-link').style.display = 'block';
+                }
+                
+                // Load dashboard
+                if (typeof loadDashboard === 'function') {
+                    loadDashboard(user);
                 }
             } catch (error) {
                 console.error('Error checking authentication:', error);

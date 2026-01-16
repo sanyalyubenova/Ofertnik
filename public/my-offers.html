@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Моите оферти - Офертник</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Hide content until authentication check is complete */
+        body.auth-checking .container {
+            opacity: 0;
+            pointer-events: none;
+        }
+        .auth-loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            flex-direction: column;
+        }
+        body.auth-checking .auth-loading {
+            display: flex;
+        }
+        body:not(.auth-checking) .auth-loading {
+            display: none;
+        }
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .loading-text {
+            color: #fff;
+            font-size: 18px;
+            font-weight: 500;
+            letter-spacing: 1px;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .offers-list {
+            margin-top: 20px;
+        }
+        .offer-item {
+            background: #fff;
+            border: 2px solid #000;
+            padding: 15px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .offer-item:hover {
+            background: #f5f5f5;
+        }
+        .offer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .offer-title {
+            font-weight: bold;
+            font-size: 16px;
+        }
+        .offer-meta {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+        .offer-actions {
+            display: flex;
+            gap: 10px;
+        }
+        .btn-small {
+            padding: 5px 15px;
+            font-size: 12px;
+            background: #333;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+        .btn-small:hover {
+            background: #555;
+        }
+        .btn-small.danger {
+            background: #dc3545;
+        }
+        .btn-small.danger:hover {
+            background: #c82333;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+        }
+    </style>
+</head>
+<body class="auth-checking">
+    <div class="auth-loading">
+        <div class="spinner"></div>
+        <div class="loading-text">Зареждане<span class="loading-dots">...</span></div>
+    </div>
+    <div class="container">
+        <header>
+            <h1>Моите оферти</h1>
+            <div style="display: flex; gap: 15px; align-items: center;">
+                <a href="/" class="admin-link">← Начало</a>
+                <span id="username-display" style="color: #fff; font-size: 12px;"></span>
+                <a href="#" onclick="event.preventDefault(); logout();" class="admin-link">Изход</a>
+            </div>
+        </header>
+
+        <main>
+            <div class="card">
+                <h2>Запазени оферти</h2>
+                <div id="offers-list" class="offers-list">
+                    <p>Зареждане...</p>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>Калкулатор за застраховки - Офертник</p>
+        </footer>
+    </div>
+
+    <script src="my-offers.js"></script>
+    <script>
+        // Check authentication on page load
+        (async function() {
+            try {
+                const response = await fetch('/api/me');
+                if (!response.ok) {
+                    window.location.href = '/login';
+                    return;
+                }
+                const user = await response.json();
+                document.body.classList.remove('auth-checking');
+                const usernameDisplay = document.getElementById('username-display');
+                if (usernameDisplay && user.username) {
+                    usernameDisplay.textContent = user.username;
+                }
+            } catch (error) {
+                console.error('Error checking authentication:', error);
+                window.location.href = '/login';
+            }
+        })();
+        
+        async function logout() {
+            try {
+                await fetch('/api/logout', { method: 'POST' });
+                window.location.href = '/login';
+            } catch (error) {
+                console.error('Error logging out:', error);
+                window.location.href = '/login';
+            }
+        }
+    </script>
+</body>
+</html>
+

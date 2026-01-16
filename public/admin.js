@@ -1,6 +1,15 @@
 let currentInsurer = '';
 let currentInsuranceType = '';
 
+// Helper function to format tariff rate without trailing zeros
+function formatTariffRate(rate) {
+    if (rate === null || rate === undefined || rate === '') return '';
+    const numRate = parseFloat(rate);
+    if (isNaN(numRate)) return '';
+    // Remove trailing zeros by converting to float and back to string
+    return parseFloat(numRate.toFixed(4)).toString();
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     initializeTabs();
     initializeInsurerSelect();
@@ -157,7 +166,7 @@ function addTariffRow(rowData = null, insertAfterRow = null, isNew = false) {
             <td><input type="number" class="tariff-to-age" value="${rowData?.toAge || ''}" min="0" step="1"></td>
             <td><input type="number" class="tariff-from-value" value="${rowData?.fromValue || ''}" min="0" step="0.01"></td>
             <td><input type="number" class="tariff-to-value" value="${rowData?.toValue || ''}" min="0" step="0.01"></td>
-            <td><input type="number" class="tariff-rate" value="${rowData?.rate || ''}" min="0" step="0.001"></td>
+            <td><input type="number" class="tariff-rate" value="${rowData?.rate ? formatTariffRate(rowData.rate) : ''}" min="0" step="0.001"></td>
             <td>
                 <button class="btn-action btn-save" onclick="saveTariffRow(this)" title="ОК">ОК</button>
             </td>
@@ -174,7 +183,7 @@ function addTariffRow(rowData = null, insertAfterRow = null, isNew = false) {
             <td class="tariff-to-age-display">${rowData.toAge !== null && rowData.toAge !== undefined ? rowData.toAge : ''}</td>
             <td class="tariff-from-value-display">${rowData.fromValue !== null && rowData.fromValue !== undefined ? rowData.fromValue : ''}</td>
             <td class="tariff-to-value-display">${rowData.toValue !== null && rowData.toValue !== undefined ? rowData.toValue : ''}</td>
-            <td class="tariff-rate-display">${rowData.rate !== null && rowData.rate !== undefined ? rowData.rate : ''}</td>
+            <td class="tariff-rate-display">${formatTariffRate(rowData.rate)}</td>
             <td>
                 <button class="btn-action btn-edit" onclick="editTariffRow(this)" title="Редактирай">Редактирай</button>
                 <button class="btn-action btn-delete" onclick="deleteRow(this)">Изтрий</button>

@@ -1317,7 +1317,19 @@ async function calculateAllOffers() {
             });
         });
         
-        const offers = Object.values(insurerMap);
+        let offers = Object.values(insurerMap);
+        
+        // Sort offers in specific order: ДЗИ, Дженерали, Бул Инс, Армеец, Булстрад
+        const insurerOrder = ['dzi', 'generali', 'bul-ins', 'armeec', 'bulstrad'];
+        offers.sort((a, b) => {
+            const indexA = insurerOrder.indexOf(a.insurer);
+            const indexB = insurerOrder.indexOf(b.insurer);
+            // If insurer not in order list, put it at the end
+            if (indexA === -1 && indexB === -1) return 0;
+            if (indexA === -1) return 1;
+            if (indexB === -1) return -1;
+            return indexA - indexB;
+        });
         
         // Store data and navigate
         const offersData = {
