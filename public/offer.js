@@ -4,6 +4,7 @@ let commonData = null;
 document.addEventListener('DOMContentLoaded', () => {
     loadOffers();
     loadOfferNumber();
+    loadPaymentType();
     
     // Save offer number when changed
     const offerNumberInput = document.getElementById('offer-number');
@@ -11,6 +12,12 @@ document.addEventListener('DOMContentLoaded', () => {
         offerNumberInput.addEventListener('change', saveOfferNumber);
         offerNumberInput.addEventListener('input', saveOfferNumber);
     }
+    
+    // Save payment type when changed
+    const paymentTypeRadios = document.querySelectorAll('input[name="payment-type"]');
+    paymentTypeRadios.forEach(radio => {
+        radio.addEventListener('change', savePaymentType);
+    });
 });
 
 function saveOfferNumber() {
@@ -25,6 +32,23 @@ function loadOfferNumber() {
     const offerNumberInput = document.getElementById('offer-number');
     if (offerNumberInput && savedOfferNumber) {
         offerNumberInput.value = savedOfferNumber;
+    }
+}
+
+function savePaymentType() {
+    const selectedRadio = document.querySelector('input[name="payment-type"]:checked');
+    if (selectedRadio) {
+        sessionStorage.setItem('paymentType', selectedRadio.value);
+    }
+}
+
+function loadPaymentType() {
+    const savedPaymentType = sessionStorage.getItem('paymentType');
+    if (savedPaymentType) {
+        const radio = document.getElementById(`payment-type-${savedPaymentType}`);
+        if (radio) {
+            radio.checked = true;
+        }
     }
 }
 

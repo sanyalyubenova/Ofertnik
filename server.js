@@ -300,7 +300,9 @@ app.post('/api/calculate', (req, res) => {
         return res.json({ premium: Math.round(premium * 100) / 100, currency: 'EUR', tariffRate });
         break;
       case 'mtpl':
-        premium = calculateMTPLPremium(data, tariff);
+        // For MTPL, need insurer parameter for tariff-specific logic
+        const insurer = req.body.insurer || null;
+        premium = calculateMTPLPremium(data, tariff, insurer);
         break;
       case 'gap':
         premium = calculateGAPPremium(data, tariff);
@@ -400,7 +402,7 @@ app.post('/api/compare', (req, res) => {
             if (insuranceType === 'casco') {
               premium = calculateCascoPremium(data, tariffData);
             } else if (insuranceType === 'mtpl') {
-              basePremium = calculateMTPLPremium(data, tariffData);
+              basePremium = calculateMTPLPremium(data, tariffData, insurer);
               tax = Math.round(basePremium * 0.02 * 100) / 100;
               gf = 6.50;
               of = Math.max(Math.round(basePremium * 0.01 * 100) / 100, 2.00);
@@ -545,23 +547,224 @@ function calculateCascoPremium(data, tariff) {
   return premium;
 }
 
-// MTPL Premium Calculation
-function calculateMTPLPremium(data, tariff) {
+// Helper function to calculate age from EGN or birthdate
+function calculateAge(data) {
+  if (data.egn) {
+    // Bulgarian EGN format: YYMMDD (first 6 digits)
+    const digits = data.egn.replace(/\D/g, '');
+    if (digits.length >= 6) {
+      const yy = parseInt(digits.substring(0, 2));
+      let mm = parseInt(digits.substring(2, 4));
+      const dd = parseInt(digits.substring(4, 6));
+      
+      let year;
+      if (mm >= 1 && mm <= 12) {
+        year = 1900 + yy;
+      } else if (mm >= 21 && mm <= 32) {
+        year = 1800 + yy;
+        mm = mm - 20;
+      } else if (mm >= 41 && mm <= 52) {
+        year = 2000 + yy;
+        mm = mm - 40;
+      } else {
+        return null;
+      }
+      
+      const birthDate = new Date(year, mm - 1, dd);
+      const today = new Date();
+      let age = today.getFullYear() - birthDate.getFullYear();
+      const monthDiff = today.getMonth() - birthDate.getMonth();
+      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+      }
+      return age >= 0 ? age : null;
+    }
+  }
+  
+  if (data.birthdate) {
+    const birthDate = new Date(data.birthdate);
+    if (!isNaN(birthDate.getTime())) {
+      const today = new Date();
+      let age = today.getFullYear() - birthDate.getFullYear();
+      const monthDiff = today.getMonth() - birthDate.getMonth();
+      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+      }
+      return age >= 0 ? age : null;
+    }
+  }
+  
+  return null;
+}
+
+// Helper function to get relevant person data based on payment type (leasing/cash)
+function getRelevantPersonData(data) {
+  const paymentType = data.paymentType || 'cash'; // Default to 'cash'
+  
+  if (paymentType === 'leasing') {
+    // For leasing: use lessee data if available, otherwise fall back to owner data
+    // Note: We don't have lessee data structure yet, so for now use owner data
+    // This can be extended later when lessee data is added to the form
+    return {
+      addressRegistration: data.leasingLesseeAddressRegion || data.addressRegion,
+      age: data.leasingLesseeAge || calculateAge(data),
+      ownerType: data.leasingLesseeOwnerType || data.ownerType
+    };
+  } else {
+    // For cash: use owner data
+    return {
+      addressRegistration: data.addressRegion,
+      age: calculateAge(data),
+      ownerType: data.ownerType
+    };
+  }
+}
+
+// Helper function to calculate vehicle age
+function calculateVehicleAge(data) {
+  if (!data.firstRegistrationDate) return null;
+  const registrationDate = new Date(data.firstRegistrationDate);
+  if (isNaN(registrationDate.getTime())) return null;
+  const today = new Date();
+  return Math.floor((today - registrationDate) / (365.25 * 24 * 60 * 60 * 1000));
+}
+
+// Helper function to match tariff row based on criteria
+function matchTariffRow(row, data, personData, vehicleAge, insurer) {
+  const engineSize = parseFloat(data.engineSize) || 0;
+  const powerKW = parseFloat(data.powerKW) || 0;
+  
+  // Match engine size
+  const engineFrom = row.engineFrom !== null && row.engineFrom !== undefined ? row.engineFrom : 0;
+  const engineTo = row.engineTo !== null && row.engineTo !== undefined ? row.engineTo : Infinity;
+  if (engineSize < engineFrom || engineSize > engineTo) {
+    return false;
+  }
+  
+  // Insurer-specific matching
+  if (insurer === 'dzi') {
+    // ДЗИ: обем двигател, възраст на собственика, тип собственик, регион
+    const ownerAge = personData.age;
+    if (ownerAge !== null) {
+      const ownerAgeFrom = row.ownerAgeFrom !== null && row.ownerAgeFrom !== undefined ? row.ownerAgeFrom : 0;
+      const ownerAgeTo = row.ownerAgeTo !== null && row.ownerAgeTo !== undefined ? row.ownerAgeTo : Infinity;
+      if (ownerAge < ownerAgeFrom || ownerAge > ownerAgeTo) {
+        return false;
+      }
+    }
+    if (row.ownerType && personData.ownerType !== row.ownerType) {
+      return false;
+    }
+    if (row.region && personData.addressRegistration !== row.region) {
+      return false;
+    }
+  } else if (insurer === 'armeec') {
+    // Армеец: обем двигател, регион (винаги на собственика)
+    const ownerAddress = data.addressRegion; // Always owner's address for Armeec
+    if (row.region && ownerAddress !== row.region) {
+      return false;
+    }
+  } else if (insurer === 'generali') {
+    // Дженерали: обем двигател, kW, регион (винаги на собственика), тип собственик, възраст (ако ФЛ), възраст на колата
+    if (row.powerFrom !== null && row.powerFrom !== undefined) {
+      const powerFrom = row.powerFrom;
+      const powerTo = row.powerTo !== null && row.powerTo !== undefined ? row.powerTo : Infinity;
+      if (powerKW < powerFrom || powerKW > powerTo) {
+        return false;
+      }
+    }
+    const ownerAddress = data.addressRegion; // Always owner's address for Generali
+    if (row.region && ownerAddress !== row.region) {
+      return false;
+    }
+    if (row.ownerType && personData.ownerType !== row.ownerType) {
+      return false;
+    }
+    if (row.ownerType === 'person' && personData.age !== null) {
+      const ownerAgeFrom = row.ownerAgeFrom !== null && row.ownerAgeFrom !== undefined ? row.ownerAgeFrom : 0;
+      const ownerAgeTo = row.ownerAgeTo !== null && row.ownerAgeTo !== undefined ? row.ownerAgeTo : Infinity;
+      if (personData.age < ownerAgeFrom || personData.age > ownerAgeTo) {
+        return false;
+      }
+    }
+    if (vehicleAge !== null) {
+      const vehicleAgeFrom = row.vehicleAgeFrom !== null && row.vehicleAgeFrom !== undefined ? row.vehicleAgeFrom : 0;
+      const vehicleAgeTo = row.vehicleAgeTo !== null && row.vehicleAgeTo !== undefined ? row.vehicleAgeTo : Infinity;
+      if (vehicleAge < vehicleAgeFrom || vehicleAge > vehicleAgeTo) {
+        return false;
+      }
+    }
+  } else if (insurer === 'bulstrad') {
+    // Булстрад: обем двигател, kW, регион, възраст на собственика, възраст на колата
+    if (row.powerFrom !== null && row.powerFrom !== undefined) {
+      const powerFrom = row.powerFrom;
+      const powerTo = row.powerTo !== null && row.powerTo !== undefined ? row.powerTo : Infinity;
+      if (powerKW < powerFrom || powerKW > powerTo) {
+        return false;
+      }
+    }
+    if (row.region && personData.addressRegistration !== row.region) {
+      return false;
+    }
+    if (personData.age !== null) {
+      const ownerAgeFrom = row.ownerAgeFrom !== null && row.ownerAgeFrom !== undefined ? row.ownerAgeFrom : 0;
+      const ownerAgeTo = row.ownerAgeTo !== null && row.ownerAgeTo !== undefined ? row.ownerAgeTo : Infinity;
+      if (personData.age < ownerAgeFrom || personData.age > ownerAgeTo) {
+        return false;
+      }
+    }
+    if (vehicleAge !== null) {
+      const vehicleAgeFrom = row.vehicleAgeFrom !== null && row.vehicleAgeFrom !== undefined ? row.vehicleAgeFrom : 0;
+      const vehicleAgeTo = row.vehicleAgeTo !== null && row.vehicleAgeTo !== undefined ? row.vehicleAgeTo : Infinity;
+      if (vehicleAge < vehicleAgeFrom || vehicleAge > vehicleAgeTo) {
+        return false;
+      }
+    }
+  }
+  
+  return true;
+}
+
+// MTPL Premium Calculation - uses table structure with base premiums
+function calculateMTPLPremium(data, tariff, insurer = null) {
+  // Get relevant person data based on payment type
+  const personData = getRelevantPersonData(data);
+  const vehicleAge = calculateVehicleAge(data);
+  
+  // If tariff has new table structure (tariffs array), use it
+  if (tariff.tariffs && Array.isArray(tariff.tariffs) && tariff.tariffs.length > 0) {
+    // Find matching row in table
+    for (const row of tariff.tariffs) {
+      if (matchTariffRow(row, data, personData, vehicleAge, insurer)) {
+        if (row.basePremium !== null && row.basePremium !== undefined) {
+          return row.basePremium;
+        }
+      }
+    }
+    // If no match found, return 0
+    console.warn('No matching tariff row found for MTPL');
+    return 0;
+  }
+  
+  // Fallback to old structure (basePremium + multipliers) for backward compatibility
   const engineSize = parseFloat(data.engineSize) || 0;
   const powerKW = parseFloat(data.powerKW) || 0;
 
-  let premium = tariff.basePremium;
+  let premium = tariff.basePremium || 0;
+  if (premium === 0) return 0;
 
   // Engine size multiplier
-  let engineMultiplier = 1.0;
-  for (const [range, mult] of Object.entries(tariff.engineSizeMultiplier)) {
-    const [min, max] = range.split('-').map(n => n === '+' ? Infinity : parseInt(n));
-    if (engineSize >= min && engineSize <= max) {
-      engineMultiplier = mult;
-      break;
+  if (tariff.engineSizeMultiplier) {
+    let engineMultiplier = 1.0;
+    for (const [range, mult] of Object.entries(tariff.engineSizeMultiplier)) {
+      const [min, max] = range.split('-').map(n => n === '+' ? Infinity : parseInt(n));
+      if (engineSize >= min && engineSize <= max) {
+        engineMultiplier = mult;
+        break;
+      }
     }
+    premium *= engineMultiplier;
   }
-  premium *= engineMultiplier;
 
   // Power multiplier (if exists in tariff)
   if (tariff.powerMultiplier && powerKW > 0) {
@@ -576,8 +779,8 @@ function calculateMTPLPremium(data, tariff) {
     premium *= powerMultiplier;
   }
 
-  // Add 2% tax on insurance premiums (like CASCO)
-  premium = premium * 1.02;
+  // Note: Tax (2%), GF, and OF are added after this function returns, in the calling code
+  // This function returns the base premium before tax/GF/OF
 
   return premium;
 }

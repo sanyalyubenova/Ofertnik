@@ -136,6 +136,79 @@ function updateTariffEditTitle() {
     
     insurerNameSpan.textContent = insurerNames[currentInsurer] || currentInsurer;
     insuranceTypeNameSpan.textContent = insuranceTypeNames[currentInsuranceType] || currentInsuranceType;
+    
+    // Show/hide sections based on insurance type
+    updateTariffSections();
+}
+
+function updateTariffSections() {
+    // Hide all sections first
+    document.getElementById('casco-tariffs-section').style.display = 'none';
+    document.getElementById('mtpl-tariffs-section').style.display = 'none';
+    
+    if (currentInsuranceType === 'casco') {
+        // CASCO: Show CASCO tariffs table
+        document.getElementById('casco-tariffs-section').style.display = 'block';
+        // Hide MTPL section headers
+        const mtplThead = document.getElementById('mtpl-tariffs-thead');
+        if (mtplThead) mtplThead.innerHTML = '';
+    } else if (currentInsuranceType === 'mtpl') {
+        // MTPL: Show MTPL tariffs table with dynamic headers based on insurer
+        document.getElementById('mtpl-tariffs-section').style.display = 'block';
+        updateMTPLTableHeaders();
+    }
+}
+
+function updateMTPLTableHeaders() {
+    const thead = document.getElementById('mtpl-tariffs-thead');
+    if (!thead) return;
+    
+    let headers = '<tr><th style="width: 60px;"></th>';
+    
+    // Common headers for all insurers
+    headers += '<th>Обем двигател (от)</th>';
+    headers += '<th>Обем двигател (до)</th>';
+    
+    // Insurer-specific headers
+    if (currentInsurer === 'dzi') {
+        // ДЗИ: обем двигател, възраст на собственика, адресна регистрация, тип собственик, базова премия
+        headers += '<th>Възраст на собственика (от)</th>';
+        headers += '<th>Възраст на собственика (до)</th>';
+        headers += '<th>Тип собственик</th>';
+        headers += '<th>Регион</th>';
+        headers += '<th>Базова премия (€)</th>';
+    } else if (currentInsurer === 'armeec') {
+        // Армеец: обем двигател, адресна регистрация, базова премия
+        headers += '<th>Регион</th>';
+        headers += '<th>Базова премия (€)</th>';
+    } else if (currentInsurer === 'generali') {
+        // Дженерали: обем двигател, kW, адресна регистрация, тип собственик, възраст (ако ФЛ), възраст на колата, базова премия
+        headers += '<th>kW (от)</th>';
+        headers += '<th>kW (до)</th>';
+        headers += '<th>Регион</th>';
+        headers += '<th>Тип собственик</th>';
+        headers += '<th>Възраст на собственика (от)</th>';
+        headers += '<th>Възраст на собственика (до)</th>';
+        headers += '<th>Възраст на колата (от)</th>';
+        headers += '<th>Възраст на колата (до)</th>';
+        headers += '<th>Базова премия (€)</th>';
+    } else if (currentInsurer === 'bulstrad') {
+        // Булстрад: обем двигател, kW, адресна регистрация, възраст на собственика, възраст на колата, базова премия
+        headers += '<th>kW (от)</th>';
+        headers += '<th>kW (до)</th>';
+        headers += '<th>Регион</th>';
+        headers += '<th>Възраст на собственика (от)</th>';
+        headers += '<th>Възраст на собственика (до)</th>';
+        headers += '<th>Възраст на колата (от)</th>';
+        headers += '<th>Възраст на колата (до)</th>';
+        headers += '<th>Базова премия (€)</th>';
+    } else {
+        // Default for other insurers: обем двигател, базова премия
+        headers += '<th>Базова премия (€)</th>';
+    }
+    
+    headers += '<th>Действия</th></tr>';
+    thead.innerHTML = headers;
 }
 
 function initializeTables() {
@@ -150,6 +223,56 @@ function initializeTables() {
     document.getElementById('add-surcharge-row').addEventListener('click', () => {
         addSurchargeRow(null, null, true);
     });
+    
+    // MTPL tariff row button
+    document.getElementById('add-mtpl-tariff-row')?.addEventListener('click', () => {
+        // Ensure headers are generated first
+        if (currentInsuranceType === 'mtpl' && currentInsurer) {
+            updateMTPLTableHeaders();
+        }
+        addMTPLTariffRow(null, null, true);
+    });
+    
+    // Copy last MTPL row button
+    document.getElementById('copy-last-mtpl-row')?.addEventListener('click', () => {
+        copyLastMTPLTariffRow();
+    });
+}
+
+function copyLastMTPLTariffRow() {
+    const tbody = document.getElementById('mtpl-tariffs-tbody');
+    if (!tbody) return;
+    
+    const viewRows = Array.from(tbody.querySelectorAll('tr.view-row'));
+    if (viewRows.length === 0) {
+        alert('Няма редове за копиране. Моля, добавете първо ред.');
+        return;
+    }
+    
+    // Get the last row's data
+    const lastRow = viewRows[viewRows.length - 1];
+    const lastRowDataJson = lastRow.getAttribute('data-row-data');
+    if (!lastRowDataJson) {
+        alert('Не може да се копира последният ред.');
+        return;
+    }
+    
+    const lastRowData = JSON.parse(lastRowDataJson);
+    
+    // Create a copy with cleared base premium (optional - user might want to keep it)
+    // For now, we'll copy everything as-is
+    const copiedData = JSON.parse(JSON.stringify(lastRowData)); // Deep copy
+    
+    // Add new row with copied data in edit mode
+    addMTPLTariffRow(copiedData, null, true);
+    
+    // Scroll to the new row
+    setTimeout(() => {
+        const newRow = tbody.querySelector('tr.editing-row:last-child');
+        if (newRow) {
+            newRow.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+    }, 100);
 }
 
 function addTariffRow(rowData = null, insertAfterRow = null, isNew = false) {
@@ -542,17 +665,42 @@ function collectTableData() {
         surcharges: []
     };
 
-    // Collect tariff data (only view rows) - querySelectorAll returns elements in DOM order
-    const tariffRows = Array.from(document.querySelectorAll('#tariffs-tbody tr.view-row'));
-    console.log(`Collecting ${tariffRows.length} tariff rows in DOM order`);
-    tariffRows.forEach((row, index) => {
-        const rowDataJson = row.getAttribute('data-row-data');
-        if (rowDataJson) {
-            const rowData = JSON.parse(rowDataJson);
-            data.tariffs.push(rowData);
-            console.log(`  Tariff ${index + 1}:`, rowData);
+    if (currentInsuranceType === 'casco') {
+        // CASCO: Collect tariff data (only view rows) - querySelectorAll returns elements in DOM order
+        const tariffRows = Array.from(document.querySelectorAll('#tariffs-tbody tr.view-row'));
+        console.log(`Collecting ${tariffRows.length} tariff rows in DOM order`);
+        tariffRows.forEach((row, index) => {
+            const rowDataJson = row.getAttribute('data-row-data');
+            if (rowDataJson) {
+                const rowData = JSON.parse(rowDataJson);
+                data.tariffs.push(rowData);
+                console.log(`  Tariff ${index + 1}:`, rowData);
+            }
+        });
+    } else if (currentInsuranceType === 'mtpl') {
+        // MTPL: Collect MTPL tariff data (base premiums table)
+        const mtplTariffRows = Array.from(document.querySelectorAll('#mtpl-tariffs-tbody tr.view-row'));
+        console.log(`Collecting ${mtplTariffRows.length} MTPL tariff rows in DOM order`);
+        mtplTariffRows.forEach((row, index) => {
+            const rowDataJson = row.getAttribute('data-row-data');
+            if (rowDataJson) {
+                const rowData = JSON.parse(rowDataJson);
+                data.tariffs.push(rowData);
+                console.log(`  MTPL Tariff ${index + 1}:`, rowData);
+            }
+        });
+        
+        // Also preserve old structure if it exists (for backward compatibility)
+        if (data.basePremium !== undefined) {
+            data.basePremium = data.basePremium;
         }
-    });
+        if (data.engineSizeMultiplier !== undefined) {
+            data.engineSizeMultiplier = data.engineSizeMultiplier;
+        }
+        if (data.powerMultiplier !== undefined) {
+            data.powerMultiplier = data.powerMultiplier;
+        }
+    }
 
     // Collect discount data (only view rows)
     const discountRows = Array.from(document.querySelectorAll('#discounts-tbody tr.view-row'));
@@ -583,11 +731,29 @@ function collectTableData() {
 }
 
 function loadTableData(data) {
-    // Load tariffs
-    const tariffsTbody = document.getElementById('tariffs-tbody');
-    tariffsTbody.innerHTML = '';
-    if (data.tariffs && data.tariffs.length > 0) {
-        data.tariffs.forEach(row => addTariffRow(row, null, false));
+    if (currentInsuranceType === 'casco') {
+        // CASCO: Load tariffs
+        const tariffsTbody = document.getElementById('tariffs-tbody');
+        tariffsTbody.innerHTML = '';
+        if (data.tariffs && data.tariffs.length > 0) {
+            data.tariffs.forEach(row => addTariffRow(row, null, false));
+        }
+    } else if (currentInsuranceType === 'mtpl') {
+        // MTPL: Load MTPL tariffs (base premiums table)
+        const mtplTariffsTbody = document.getElementById('mtpl-tariffs-tbody');
+        if (mtplTariffsTbody) {
+            mtplTariffsTbody.innerHTML = '';
+            if (data.tariffs && data.tariffs.length > 0) {
+                // Load new table structure
+                data.tariffs.forEach(row => addMTPLTariffRow(row, null, false));
+            } else if (data.basePremium !== undefined) {
+                // Convert old structure to new structure for backward compatibility
+                // This handles existing files with basePremium + multipliers
+                // We can create a default row or leave it empty
+                console.log('Found old MTPL structure, converting...');
+                // For now, leave empty - user can add rows manually
+            }
+        }
     }
 
     // Load discounts
@@ -609,6 +775,9 @@ async function loadTariffData() {
     if (!currentInsurer || !currentInsuranceType) {
         return;
     }
+    
+    // Update sections visibility first
+    updateTariffSections();
     
     try {
         const tariffKey = `${currentInsurer}-${currentInsuranceType}`;
@@ -659,6 +828,238 @@ async function saveTariffData() {
     }
 }
 
+// MTPL Tariff Row Management
+function addMTPLTariffRow(rowData = null, insertAfterRow = null, isNew = false) {
+    const tbody = document.getElementById('mtpl-tariffs-tbody');
+    if (!tbody) {
+        console.error('mtpl-tariffs-tbody not found!');
+        return null;
+    }
+    
+    const row = document.createElement('tr');
+    const isEditing = isNew || !rowData;
+    
+    if (isEditing) {
+        // Editing mode - generate inputs based on insurer
+        let html = '<td></td>';
+        html += `<td><input type="number" class="mtpl-engine-from" value="${rowData?.engineFrom || ''}" min="0" step="0.01"></td>`;
+        html += `<td><input type="number" class="mtpl-engine-to" value="${rowData?.engineTo !== null && rowData?.engineTo !== undefined ? rowData.engineTo : ''}" min="0" step="0.01" placeholder="+ за над"></td>`;
+        
+        // Insurer-specific inputs
+        if (currentInsurer === 'dzi') {
+            html += `<td><input type="number" class="mtpl-owner-age-from" value="${rowData?.ownerAgeFrom || ''}" min="0" step="1"></td>`;
+            html += `<td><input type="number" class="mtpl-owner-age-to" value="${rowData?.ownerAgeTo !== null && rowData?.ownerAgeTo !== undefined ? rowData.ownerAgeTo : ''}" min="0" step="1" placeholder="+ за над"></td>`;
+            html += `<td>
+                <select class="mtpl-owner-type">
+                    <option value="person" ${rowData?.ownerType === 'person' ? 'selected' : ''}>Физическо лице</option>
+                    <option value="company" ${rowData?.ownerType === 'company' ? 'selected' : ''}>Юридическо лице</option>
+                </select>
+            </td>`;
+            html += `<td><input type="text" class="mtpl-region" value="${rowData?.region || ''}" placeholder="Регион"></td>`;
+            html += `<td><input type="number" class="mtpl-base-premium" value="${rowData?.basePremium || ''}" min="0" step="0.01"></td>`;
+        } else if (currentInsurer === 'armeec') {
+            html += `<td><input type="text" class="mtpl-region" value="${rowData?.region || ''}" placeholder="Регион"></td>`;
+            html += `<td><input type="number" class="mtpl-base-premium" value="${rowData?.basePremium || ''}" min="0" step="0.01"></td>`;
+        } else if (currentInsurer === 'generali') {
+            html += `<td><input type="number" class="mtpl-power-from" value="${rowData?.powerFrom || ''}" min="0" step="0.01"></td>`;
+            html += `<td><input type="number" class="mtpl-power-to" value="${rowData?.powerTo !== null && rowData?.powerTo !== undefined ? rowData.powerTo : ''}" min="0" step="0.01" placeholder="+ за над"></td>`;
+            html += `<td><input type="text" class="mtpl-region" value="${rowData?.region || ''}" placeholder="Регион"></td>`;
+            html += `<td>
+                <select class="mtpl-owner-type">
+                    <option value="person" ${rowData?.ownerType === 'person' ? 'selected' : ''}>Физическо лице</option>
+                    <option value="company" ${rowData?.ownerType === 'company' ? 'selected' : ''}>Юридическо лице</option>
+                </select>
+            </td>`;
+            html += `<td><input type="number" class="mtpl-owner-age-from" value="${rowData?.ownerAgeFrom || ''}" min="0" step="1"></td>`;
+            html += `<td><input type="number" class="mtpl-owner-age-to" value="${rowData?.ownerAgeTo !== null && rowData?.ownerAgeTo !== undefined ? rowData.ownerAgeTo : ''}" min="0" step="1" placeholder="+ за над"></td>`;
+            html += `<td><input type="number" class="mtpl-vehicle-age-from" value="${rowData?.vehicleAgeFrom || ''}" min="0" step="1"></td>`;
+            html += `<td><input type="number" class="mtpl-vehicle-age-to" value="${rowData?.vehicleAgeTo !== null && rowData?.vehicleAgeTo !== undefined ? rowData.vehicleAgeTo : ''}" min="0" step="1" placeholder="+ за над"></td>`;
+            html += `<td><input type="number" class="mtpl-base-premium" value="${rowData?.basePremium || ''}" min="0" step="0.01"></td>`;
+        } else if (currentInsurer === 'bulstrad') {
+            html += `<td><input type="number" class="mtpl-power-from" value="${rowData?.powerFrom || ''}" min="0" step="0.01"></td>`;
+            html += `<td><input type="number" class="mtpl-power-to" value="${rowData?.powerTo !== null && rowData?.powerTo !== undefined ? rowData.powerTo : ''}" min="0" step="0.01" placeholder="+ за над"></td>`;
+            html += `<td><input type="text" class="mtpl-region" value="${rowData?.region || ''}" placeholder="Регион"></td>`;
+            html += `<td><input type="number" class="mtpl-owner-age-from" value="${rowData?.ownerAgeFrom || ''}" min="0" step="1"></td>`;
+            html += `<td><input type="number" class="mtpl-owner-age-to" value="${rowData?.ownerAgeTo !== null && rowData?.ownerAgeTo !== undefined ? rowData.ownerAgeTo : ''}" min="0" step="1" placeholder="+ за над"></td>`;
+            html += `<td><input type="number" class="mtpl-vehicle-age-from" value="${rowData?.vehicleAgeFrom || ''}" min="0" step="1"></td>`;
+            html += `<td><input type="number" class="mtpl-vehicle-age-to" value="${rowData?.vehicleAgeTo !== null && rowData?.vehicleAgeTo !== undefined ? rowData.vehicleAgeTo : ''}" min="0" step="1" placeholder="+ за над"></td>`;
+            html += `<td><input type="number" class="mtpl-base-premium" value="${rowData?.basePremium || ''}" min="0" step="0.01"></td>`;
+        } else {
+            // Default for other insurers
+            html += `<td><input type="number" class="mtpl-base-premium" value="${rowData?.basePremium || ''}" min="0" step="0.01"></td>`;
+        }
+        
+        html += `<td><button class="btn-action btn-save" onclick="saveMTPLTariffRow(this)" title="ОК">ОК</button></td>`;
+        row.innerHTML = html;
+        row.classList.add('editing-row');
+    } else {
+        // View mode - display values
+        let html = '<td><button class="btn-action btn-move-up" onclick="moveMTPLTariffRowUp(this)" title="Нагоре">↑</button><button class="btn-action btn-move-down" onclick="moveMTPLTariffRowDown(this)" title="Надолу">↓</button></td>';
+        html += `<td class="mtpl-engine-from-display">${rowData.engineFrom !== null && rowData.engineFrom !== undefined ? rowData.engineFrom : ''}</td>`;
+        html += `<td class="mtpl-engine-to-display">${rowData.engineTo !== null && rowData.engineTo !== undefined ? rowData.engineTo : '+'}</td>`;
+        
+        // Insurer-specific displays
+        if (currentInsurer === 'dzi') {
+            html += `<td class="mtpl-owner-age-from-display">${rowData.ownerAgeFrom !== null && rowData.ownerAgeFrom !== undefined ? rowData.ownerAgeFrom : ''}</td>`;
+            html += `<td class="mtpl-owner-age-to-display">${rowData.ownerAgeTo !== null && rowData.ownerAgeTo !== undefined ? rowData.ownerAgeTo : '+'}</td>`;
+            const ownerTypeText = rowData.ownerType === 'person' ? 'ФЛ' : (rowData.ownerType === 'company' ? 'ЮЛ' : '');
+            html += `<td class="mtpl-owner-type-display">${ownerTypeText}</td>`;
+            html += `<td class="mtpl-region-display">${rowData.region || ''}</td>`;
+            html += `<td class="mtpl-base-premium-display">${rowData.basePremium || ''}</td>`;
+        } else if (currentInsurer === 'armeec') {
+            html += `<td class="mtpl-region-display">${rowData.region || ''}</td>`;
+            html += `<td class="mtpl-base-premium-display">${rowData.basePremium || ''}</td>`;
+        } else if (currentInsurer === 'generali') {
+            html += `<td class="mtpl-power-from-display">${rowData.powerFrom !== null && rowData.powerFrom !== undefined ? rowData.powerFrom : ''}</td>`;
+            html += `<td class="mtpl-power-to-display">${rowData.powerTo !== null && rowData.powerTo !== undefined ? rowData.powerTo : '+'}</td>`;
+            html += `<td class="mtpl-region-display">${rowData.region || ''}</td>`;
+            const ownerTypeText = rowData.ownerType === 'person' ? 'ФЛ' : (rowData.ownerType === 'company' ? 'ЮЛ' : '');
+            html += `<td class="mtpl-owner-type-display">${ownerTypeText}</td>`;
+            html += `<td class="mtpl-owner-age-from-display">${rowData.ownerAgeFrom !== null && rowData.ownerAgeFrom !== undefined ? rowData.ownerAgeFrom : ''}</td>`;
+            html += `<td class="mtpl-owner-age-to-display">${rowData.ownerAgeTo !== null && rowData.ownerAgeTo !== undefined ? rowData.ownerAgeTo : '+'}</td>`;
+            html += `<td class="mtpl-vehicle-age-from-display">${rowData.vehicleAgeFrom !== null && rowData.vehicleAgeFrom !== undefined ? rowData.vehicleAgeFrom : ''}</td>`;
+            html += `<td class="mtpl-vehicle-age-to-display">${rowData.vehicleAgeTo !== null && rowData.vehicleAgeTo !== undefined ? rowData.vehicleAgeTo : '+'}</td>`;
+            html += `<td class="mtpl-base-premium-display">${rowData.basePremium || ''}</td>`;
+        } else if (currentInsurer === 'bulstrad') {
+            html += `<td class="mtpl-power-from-display">${rowData.powerFrom !== null && rowData.powerFrom !== undefined ? rowData.powerFrom : ''}</td>`;
+            html += `<td class="mtpl-power-to-display">${rowData.powerTo !== null && rowData.powerTo !== undefined ? rowData.powerTo : '+'}</td>`;
+            html += `<td class="mtpl-region-display">${rowData.region || ''}</td>`;
+            html += `<td class="mtpl-owner-age-from-display">${rowData.ownerAgeFrom !== null && rowData.ownerAgeFrom !== undefined ? rowData.ownerAgeFrom : ''}</td>`;
+            html += `<td class="mtpl-owner-age-to-display">${rowData.ownerAgeTo !== null && rowData.ownerAgeTo !== undefined ? rowData.ownerAgeTo : '+'}</td>`;
+            html += `<td class="mtpl-vehicle-age-from-display">${rowData.vehicleAgeFrom !== null && rowData.vehicleAgeFrom !== undefined ? rowData.vehicleAgeFrom : ''}</td>`;
+            html += `<td class="mtpl-vehicle-age-to-display">${rowData.vehicleAgeTo !== null && rowData.vehicleAgeTo !== undefined ? rowData.vehicleAgeTo : '+'}</td>`;
+            html += `<td class="mtpl-base-premium-display">${rowData.basePremium || ''}</td>`;
+        } else {
+            html += `<td class="mtpl-base-premium-display">${rowData.basePremium || ''}</td>`;
+        }
+        
+        html += `<td>
+            <button class="btn-action btn-edit" onclick="editMTPLTariffRow(this)" title="Редактирай">Редактирай</button>
+            <button class="btn-action btn-delete" onclick="deleteMTPLTariffRow(this)">Изтрий</button>
+        </td>`;
+        row.innerHTML = html;
+        row.classList.add('view-row');
+        row.setAttribute('data-row-data', JSON.stringify(rowData));
+    }
+    
+    if (insertAfterRow) {
+        insertAfterRow.insertAdjacentElement('afterend', row);
+    } else {
+        tbody.appendChild(row);
+    }
+    
+    return row;
+}
+
+function saveMTPLTariffRow(btn) {
+    const row = btn.closest('tr');
+    const rowData = {};
+    
+    // Common fields
+    const engineFrom = row.querySelector('.mtpl-engine-from');
+    const engineTo = row.querySelector('.mtpl-engine-to');
+    if (engineFrom) rowData.engineFrom = engineFrom.value ? parseFloat(engineFrom.value) : null;
+    if (engineTo) rowData.engineTo = engineTo.value ? parseFloat(engineTo.value) : null;
+    
+    // Insurer-specific fields
+    if (currentInsurer === 'dzi') {
+        const ownerAgeFrom = row.querySelector('.mtpl-owner-age-from');
+        const ownerAgeTo = row.querySelector('.mtpl-owner-age-to');
+        const ownerType = row.querySelector('.mtpl-owner-type');
+        const region = row.querySelector('.mtpl-region');
+        const basePremium = row.querySelector('.mtpl-base-premium');
+        if (ownerAgeFrom) rowData.ownerAgeFrom = ownerAgeFrom.value ? parseInt(ownerAgeFrom.value) : null;
+        if (ownerAgeTo) rowData.ownerAgeTo = ownerAgeTo.value ? parseInt(ownerAgeTo.value) : null;
+        if (ownerType) rowData.ownerType = ownerType.value || null;
+        if (region) rowData.region = region.value.trim() || null;
+        if (basePremium) rowData.basePremium = basePremium.value ? parseFloat(basePremium.value) : null;
+    } else if (currentInsurer === 'armeec') {
+        const region = row.querySelector('.mtpl-region');
+        const basePremium = row.querySelector('.mtpl-base-premium');
+        if (region) rowData.region = region.value.trim() || null;
+        if (basePremium) rowData.basePremium = basePremium.value ? parseFloat(basePremium.value) : null;
+    } else if (currentInsurer === 'generali') {
+        const powerFrom = row.querySelector('.mtpl-power-from');
+        const powerTo = row.querySelector('.mtpl-power-to');
+        const region = row.querySelector('.mtpl-region');
+        const ownerType = row.querySelector('.mtpl-owner-type');
+        const ownerAgeFrom = row.querySelector('.mtpl-owner-age-from');
+        const ownerAgeTo = row.querySelector('.mtpl-owner-age-to');
+        const vehicleAgeFrom = row.querySelector('.mtpl-vehicle-age-from');
+        const vehicleAgeTo = row.querySelector('.mtpl-vehicle-age-to');
+        const basePremium = row.querySelector('.mtpl-base-premium');
+        if (powerFrom) rowData.powerFrom = powerFrom.value ? parseFloat(powerFrom.value) : null;
+        if (powerTo) rowData.powerTo = powerTo.value ? parseFloat(powerTo.value) : null;
+        if (region) rowData.region = region.value.trim() || null;
+        if (ownerType) rowData.ownerType = ownerType.value || null;
+        if (ownerAgeFrom) rowData.ownerAgeFrom = ownerAgeFrom.value ? parseInt(ownerAgeFrom.value) : null;
+        if (ownerAgeTo) rowData.ownerAgeTo = ownerAgeTo.value ? parseInt(ownerAgeTo.value) : null;
+        if (vehicleAgeFrom) rowData.vehicleAgeFrom = vehicleAgeFrom.value ? parseInt(vehicleAgeFrom.value) : null;
+        if (vehicleAgeTo) rowData.vehicleAgeTo = vehicleAgeTo.value ? parseInt(vehicleAgeTo.value) : null;
+        if (basePremium) rowData.basePremium = basePremium.value ? parseFloat(basePremium.value) : null;
+    } else if (currentInsurer === 'bulstrad') {
+        const powerFrom = row.querySelector('.mtpl-power-from');
+        const powerTo = row.querySelector('.mtpl-power-to');
+        const region = row.querySelector('.mtpl-region');
+        const ownerAgeFrom = row.querySelector('.mtpl-owner-age-from');
+        const ownerAgeTo = row.querySelector('.mtpl-owner-age-to');
+        const vehicleAgeFrom = row.querySelector('.mtpl-vehicle-age-from');
+        const vehicleAgeTo = row.querySelector('.mtpl-vehicle-age-to');
+        const basePremium = row.querySelector('.mtpl-base-premium');
+        if (powerFrom) rowData.powerFrom = powerFrom.value ? parseFloat(powerFrom.value) : null;
+        if (powerTo) rowData.powerTo = powerTo.value ? parseFloat(powerTo.value) : null;
+        if (region) rowData.region = region.value.trim() || null;
+        if (ownerAgeFrom) rowData.ownerAgeFrom = ownerAgeFrom.value ? parseInt(ownerAgeFrom.value) : null;
+        if (ownerAgeTo) rowData.ownerAgeTo = ownerAgeTo.value ? parseInt(ownerAgeTo.value) : null;
+        if (vehicleAgeFrom) rowData.vehicleAgeFrom = vehicleAgeFrom.value ? parseInt(vehicleAgeFrom.value) : null;
+        if (vehicleAgeTo) rowData.vehicleAgeTo = vehicleAgeTo.value ? parseInt(vehicleAgeTo.value) : null;
+        if (basePremium) rowData.basePremium = basePremium.value ? parseFloat(basePremium.value) : null;
+    } else {
+        const basePremium = row.querySelector('.mtpl-base-premium');
+        if (basePremium) rowData.basePremium = basePremium.value ? parseFloat(basePremium.value) : null;
+    }
+    
+    // Switch to view mode
+    addMTPLTariffRow(rowData, row, false);
+    row.remove();
+    saveTariffData();
+}
+
+function editMTPLTariffRow(btn) {
+    const row = btn.closest('tr');
+    const rowDataJson = row.getAttribute('data-row-data');
+    const rowData = rowDataJson ? JSON.parse(rowDataJson) : null;
+    
+    // Switch to editing mode
+    addMTPLTariffRow(rowData, row, true);
+    row.remove();
+}
+
+function deleteMTPLTariffRow(btn) {
+    if (confirm('Сигурни ли сте, че искате да изтриете този ред?')) {
+        btn.closest('tr').remove();
+        saveTariffData();
+    }
+}
+
+function moveMTPLTariffRowUp(btn) {
+    const row = btn.closest('tr');
+    const prevRow = row.previousElementSibling;
+    if (prevRow && prevRow.classList.contains('view-row')) {
+        row.parentNode.insertBefore(row, prevRow);
+        setTimeout(() => saveTariffData(), 50);
+    }
+}
+
+function moveMTPLTariffRowDown(btn) {
+    const row = btn.closest('tr');
+    const nextRow = row.nextElementSibling;
+    if (nextRow && nextRow.classList.contains('view-row')) {
+        row.parentNode.insertBefore(nextRow, row);
+        setTimeout(() => saveTariffData(), 50);
+    }
+}
+
 // Make functions available globally
 window.deleteRow = deleteRow;
 window.saveTariffRow = saveTariffRow;
@@ -673,3 +1074,8 @@ window.saveSurchargeRow = saveSurchargeRow;
 window.editSurchargeRow = editSurchargeRow;
 window.moveSurchargeRowUp = moveSurchargeRowUp;
 window.moveSurchargeRowDown = moveSurchargeRowDown;
+window.saveMTPLTariffRow = saveMTPLTariffRow;
+window.editMTPLTariffRow = editMTPLTariffRow;
+window.deleteMTPLTariffRow = deleteMTPLTariffRow;
+window.moveMTPLTariffRowUp = moveMTPLTariffRowUp;
+window.moveMTPLTariffRowDown = moveMTPLTariffRowDown;

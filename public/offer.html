@@ -19,9 +19,22 @@
 
         <main>
             <div class="card">
-                <div class="offer-number-section">
-                    <label for="offer-number">Номер на оферта:</label>
-                    <input type="text" id="offer-number" placeholder="Въведете номер на оферта">
+                <div class="offer-number-section" style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <label for="offer-number">Номер на оферта:</label>
+                        <input type="text" id="offer-number" placeholder="Въведете номер на оферта">
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <label style="font-weight: normal;">Вид плащане:</label>
+                        <label style="display: flex; align-items: center; gap: 5px; font-weight: normal; cursor: pointer;">
+                            <input type="radio" name="payment-type" id="payment-type-cash" value="cash" checked>
+                            <span>Кеш</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 5px; font-weight: normal; cursor: pointer;">
+                            <input type="radio" name="payment-type" id="payment-type-leasing" value="leasing">
+                            <span>Лизинг</span>
+                        </label>
+                    </div>
                 </div>
                 <div id="offers-container">
                     <p>Зареждане...</p>

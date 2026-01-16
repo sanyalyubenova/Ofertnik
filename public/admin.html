@@ -61,26 +61,49 @@
                     <!-- <div class="tab-header">
                         <h3>Основни тарифни числа</h3>
                     </div> -->
-                    <div class="table-container">
-                        <div class="table-scroll-wrapper">
-                            <table class="data-table" id="tariffs-table">
-                                <thead>
-                                    <tr>
-                                        <th style="width: 60px;"></th>
-                                        <th>Възраст на автомобила (от)</th>
-                                        <th>Възраст на автомобила (до)</th>
-                                        <th>Застрахователна сума от (€)</th>
-                                        <th>Застрахователна сума до (€)</th>
-                                        <th>Тарифен процент (%)</th>
-                                        <th>Действия</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="tariffs-tbody">
-                                    <!-- Rows will be added dynamically -->
-                                </tbody>
-                            </table>
+                    <!-- CASCO: Таблица за възраст на автомобила и застрахователна сума -->
+                    <div id="casco-tariffs-section" class="tariff-section">
+                        <div class="table-container">
+                            <div class="table-scroll-wrapper">
+                                <table class="data-table" id="tariffs-table">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 60px;"></th>
+                                            <th>Възраст на автомобила (от)</th>
+                                            <th>Възраст на автомобила (до)</th>
+                                            <th>Застрахователна сума от (€)</th>
+                                            <th>Застрахователна сума до (€)</th>
+                                            <th>Тарифен процент (%)</th>
+                                            <th>Действия</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tariffs-tbody">
+                                        <!-- Rows will be added dynamically -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            <button class="btn btn-add" id="add-tariff-row">+ Добави ред</button>
                         </div>
-                        <button class="btn btn-add" id="add-tariff-row">+ Добави ред</button>
+                    </div>
+                    
+                    <!-- MTPL: Таблица с базови премии по комбинации от критерии -->
+                    <div id="mtpl-tariffs-section" class="tariff-section" style="display: none;">
+                        <div class="table-container">
+                            <div class="table-scroll-wrapper">
+                                <table class="data-table" id="mtpl-tariffs-table">
+                                    <thead id="mtpl-tariffs-thead">
+                                        <!-- Headers will be added dynamically based on insurer -->
+                                    </thead>
+                                    <tbody id="mtpl-tariffs-tbody">
+                                        <!-- Rows will be added dynamically -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div style="display: flex; gap: 10px;">
+                                <button class="btn btn-add" id="add-mtpl-tariff-row">+ Добави ред</button>
+                                <button class="btn btn-add" id="copy-last-mtpl-row" style="background: #17a2b8;">📋 Копирай последен ред</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
