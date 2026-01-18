@@ -1,0 +1,104 @@
+{
+  "tariffs": [
+    {
+      "fromAge": 0,
+      "toAge": 3,
+      "fromValue": 0,
+      "toValue": 12782.3,
+      "rate": 5.4
+    },
+    {
+      "fromAge": 0,
+      "toAge": 3,
+      "fromValue": 12782.31,
+      "toValue": 25564.59,
+      "rate": 5.2
+    },
+    {
+      "fromAge": 0,
+      "toAge": 3,
+      "fromValue": 25564.6,
+      "toValue": null,
+      "rate": 5
+    },
+    {
+      "fromAge": 3,
+      "toAge": 5,
+      "fromValue": 0,
+      "toValue": 10225.84,
+      "rate": 6
+    },
+    {
+      "fromAge": 3,
+      "toAge": 5,
+      "fromValue": 10225.85,
+      "toValue": 25564.59,
+      "rate": 5.6
+    },
+    {
+      "fromAge": 3,
+      "toAge": 5,
+      "fromValue": 25564.6,
+      "toValue": null,
+      "rate": 5.4
+    },
+    {
+      "fromAge": 5,
+      "toAge": 8,
+      "fromValue": 0,
+      "toValue": 5112.92,
+      "rate": 6.8
+    },
+    {
+      "fromAge": 5,
+      "toAge": 8,
+      "fromValue": 5112.93,
+      "toValue": 10225.85,
+      "rate": 6.4
+    },
+    {
+      "fromAge": 5,
+      "toAge": 8,
+      "fromValue": 10225.86,
+      "toValue": null,
+      "rate": 6
+    },
+    {
+      "fromAge": 8,
+      "toAge": 20,
+      "fromValue": 0,
+      "toValue": 2556.46,
+      "rate": 8.5
+    },
+    {
+      "fromAge": 8,
+      "toAge": 20,
+      "fromValue": 2556.47,
+      "toValue": 5112.92,
+      "rate": 7.3
+    },
+    {
+      "fromAge": 8,
+      "toAge": 20,
+      "fromValue": 5112.93,
+      "toValue": 7669.38,
+      "rate": 6.8
+    },
+    {
+      "fromAge": 8,
+      "toAge": 20,
+      "fromValue": 7669.39,
+      "toValue": null,
+      "rate": 6.3
+    },
+    {
+      "fromAge": 20,
+      "toAge": null,
+      "fromValue": null,
+      "toValue": null,
+      "rate": 9.5
+    }
+  ],
+  "discounts": [],
+  "surcharges": []
+}

@@ -44,6 +44,14 @@
                             <button type="button" class="option-btn" data-value="gap" id="gap-option-btn">GAP</button>
                         </div>
                     </div>
+                    
+                    <div class="form-group" id="payment-type-group" style="display: none;">
+                        <label>Тип плащане:</label>
+                        <div class="option-buttons" id="payment-type-buttons">
+                            <button type="button" class="option-btn" data-value="cash">Кеш</button>
+                            <button type="button" class="option-btn" data-value="leasing">Лизинг</button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -82,7 +90,10 @@
                                     </tbody>
                                 </table>
                             </div>
-                            <button class="btn btn-add" id="add-tariff-row">+ Добави ред</button>
+                            <div style="display: flex; gap: 10px;">
+                                <button class="btn btn-add" id="add-tariff-row">+ Добави ред</button>
+                                <button class="btn btn-add" id="copy-last-tariff-row" style="background: #17a2b8;">📋 Копирай последен ред</button>
+                            </div>
                         </div>
                     </div>
                     

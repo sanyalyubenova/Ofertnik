@@ -1,0 +1,41 @@
+{
+  "tariffs": [
+    {
+      "fromAge": 0,
+      "toAge": 1,
+      "fromValue": null,
+      "toValue": null,
+      "rate": 4.2
+    },
+    {
+      "fromAge": 1,
+      "toAge": 2,
+      "fromValue": null,
+      "toValue": null,
+      "rate": 4.41
+    },
+    {
+      "fromAge": 2,
+      "toAge": 4,
+      "fromValue": null,
+      "toValue": null,
+      "rate": 4.62
+    },
+    {
+      "fromAge": 4,
+      "toAge": 5,
+      "fromValue": null,
+      "toValue": null,
+      "rate": 5.25
+    },
+    {
+      "fromAge": 5,
+      "toAge": 8,
+      "fromValue": null,
+      "toValue": null,
+      "rate": 5.67
+    }
+  ],
+  "discounts": [],
+  "surcharges": []
+}

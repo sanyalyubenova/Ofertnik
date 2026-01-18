@@ -1,13 +1,13 @@
 // Hyundai models list
 const hyundaiModels = [
-    'i10', 'i20', 'i30', 'i40', 'Kona', 'Tucson', 'Santa Fe', 
-    'Elantra', 'IONIQ', 'IONIQ 5', 'IONIQ 6', 'Bayon', 'IX20', 'IX35', 'Staria'
+    'i10', 'i20', 'i30', 'i30 N', 'i40', 'Kona', 'Tucson', 'Santa Fe',
+    'Elantra', 'IONIQ', 'IONIQ 5', 'IONIQ 6', 'IONIQ 9', 'Bayon', 'ix35', 'Staria'
 ];
 
 // Popular European car brands
 const carBrands = [
-    'Hyundai', 'Volkswagen', 'Toyota', 'Ford', 'Opel', 'Renault', 
-    'Peugeot', 'Citroen', 'BMW', 'Mercedes-Benz', 'Audi', 'Skoda', 
+    'Hyundai', 'Volkswagen', 'Toyota', 'Ford', 'Opel', 'Renault',
+    'Peugeot', 'Citroen', 'BMW', 'Mercedes-Benz', 'Audi', 'Skoda',
     'Seat', 'Fiat', 'Nissan', 'Kia', 'Mazda', 'Suzuki', 'Dacia'
 ];
 
@@ -65,19 +65,19 @@ function initializeBrandModelLogic() {
 
     // Load Hyundai models by default
     loadHyundaiModels();
-    
+
     // Initialize Owner Type toggle (Person/Company)
     initializeOwnerTypeToggle();
-    
+
     // Initialize EGN/Birthdate toggle
     initializeEgnBirthdateToggle();
-    
+
     // Initialize Bonus/Malus toggle
     initializeBonusMalusToggle();
 
     brandSelect.addEventListener('change', () => {
         const selectedBrand = brandSelect.value;
-        
+
         if (selectedBrand === 'other') {
             // Show manual brand input
             otherBrandGroup.style.display = 'block';
@@ -93,7 +93,7 @@ function initializeBrandModelLogic() {
             // Hide manual brand input
             otherBrandGroup.style.display = 'none';
             otherBrandInput.required = false;
-            
+
             if (selectedBrand === 'Hyundai') {
                 // Show Hyundai models dropdown
                 modelSelect.style.display = 'block';
@@ -135,20 +135,20 @@ function initializeBrandModelLogic() {
 function loadHyundaiModels() {
     const modelSelect = document.getElementById('vehicle-model');
     modelSelect.innerHTML = '';
-    
+
     // Add empty default option
     const defaultOption = document.createElement('option');
     defaultOption.value = '';
     defaultOption.textContent = 'Изберете модел';
     modelSelect.appendChild(defaultOption);
-    
+
     hyundaiModels.forEach(model => {
         const option = document.createElement('option');
         option.value = model;
         option.textContent = model;
         modelSelect.appendChild(option);
     });
-    
+
     // Add "Друг модел" option
     const otherOption = document.createElement('option');
     otherOption.value = 'other';
@@ -159,14 +159,14 @@ function loadHyundaiModels() {
 function initializeBonusMalusToggle() {
     const bonusBtn = document.querySelector('.input-type-btn[data-type="bonus"]');
     const malusBtn = document.querySelector('.input-type-btn[data-type="malus"]');
-    
+
     if (!bonusBtn || !malusBtn) return;
-    
+
     bonusBtn.addEventListener('click', () => {
         bonusBtn.classList.add('active');
         malusBtn.classList.remove('active');
     });
-    
+
     malusBtn.addEventListener('click', () => {
         malusBtn.classList.add('active');
         bonusBtn.classList.remove('active');
@@ -179,9 +179,9 @@ function initializeOwnerTypeToggle() {
     const ownerNameLabel = document.getElementById('owner-name-label');
     const ownerNameInput = document.getElementById('owner-name');
     const egnBirthdateGroup = document.getElementById('egn-birthdate-group');
-    
+
     if (!personBtn || !companyBtn || !egnBirthdateGroup) return;
-    
+
     // Update UI based on owner type
     function updateOwnerTypeUI(isPerson) {
         if (isPerson) {
@@ -217,19 +217,19 @@ function initializeOwnerTypeToggle() {
             if (ageDisplay) ageDisplay.textContent = '';
         }
     }
-    
+
     personBtn.addEventListener('click', () => {
         personBtn.classList.add('active');
         companyBtn.classList.remove('active');
         updateOwnerTypeUI(true);
     });
-    
+
     companyBtn.addEventListener('click', () => {
         companyBtn.classList.add('active');
         personBtn.classList.remove('active');
         updateOwnerTypeUI(false);
     });
-    
+
     // Initialize with person (default)
     updateOwnerTypeUI(true);
 }
@@ -240,14 +240,14 @@ function initializeEgnBirthdateToggle() {
     const egnInput = document.getElementById('egn-input');
     const birthdateInput = document.getElementById('birthdate-input');
     const ageDisplay = document.getElementById('age-display');
-    
+
     if (!egnBtn || !birthdateBtn || !egnInput || !birthdateInput || !ageDisplay) return;
-    
+
     // Function to calculate and display age
     function calculateAndDisplayAge() {
         const egnBtnActive = egnBtn.classList.contains('active');
         let age = null;
-        
+
         if (egnBtnActive && egnInput.value) {
             // Calculate age from EGN
             age = calculateAgeFromEGN(egnInput.value);
@@ -255,7 +255,7 @@ function initializeEgnBirthdateToggle() {
             // Calculate age from birthdate
             age = calculateAgeFromDate(birthdateInput.value);
         }
-        
+
         if (age !== null) {
             ageDisplay.textContent = `Възраст: ${age} ${age === 1 ? 'година' : 'години'}`;
             ageDisplay.classList.add('show');
@@ -263,7 +263,7 @@ function initializeEgnBirthdateToggle() {
             ageDisplay.classList.remove('show');
         }
     }
-    
+
     egnBtn.addEventListener('click', () => {
         egnBtn.classList.add('active');
         birthdateBtn.classList.remove('active');
@@ -274,7 +274,7 @@ function initializeEgnBirthdateToggle() {
         birthdateInput.value = '';
         calculateAndDisplayAge();
     });
-    
+
     birthdateBtn.addEventListener('click', () => {
         birthdateBtn.classList.add('active');
         egnBtn.classList.remove('active');
@@ -285,12 +285,12 @@ function initializeEgnBirthdateToggle() {
         egnInput.value = '';
         calculateAndDisplayAge();
     });
-    
+
     // Listen for input changes
     egnInput.addEventListener('input', () => {
         calculateAndDisplayAge();
     });
-    
+
     birthdateInput.addEventListener('input', () => {
         calculateAndDisplayAge();
     });
@@ -300,17 +300,17 @@ function calculateAgeFromEGN(egn) {
     // Bulgarian EGN format: YYMMDD (first 6 digits)
     // Months: 01-12 (1900-1999), 21-32 (1800-1899), 41-52 (2000-2099)
     if (!egn) return null;
-    
+
     const digits = egn.replace(/\D/g, '');
     if (digits.length < 6) return null;
-    
+
     try {
         const yy = parseInt(digits.substring(0, 2));
         let mm = parseInt(digits.substring(2, 4));
         const dd = parseInt(digits.substring(4, 6));
-        
+
         if (dd < 1 || dd > 31) return null;
-        
+
         // Determine century based on month
         let year;
         if (mm >= 1 && mm <= 12) {
@@ -327,15 +327,15 @@ function calculateAgeFromEGN(egn) {
         } else {
             return null; // Invalid month
         }
-        
+
         // Validate date
         const birthDate = new Date(year, mm - 1, dd);
-        if (birthDate.getFullYear() !== year || 
-            birthDate.getMonth() !== mm - 1 || 
+        if (birthDate.getFullYear() !== year ||
+            birthDate.getMonth() !== mm - 1 ||
             birthDate.getDate() !== dd) {
             return null;
         }
-        
+
         return calculateAgeFromDate(birthDate);
     } catch (e) {
         return null;
@@ -344,7 +344,7 @@ function calculateAgeFromEGN(egn) {
 
 function calculateAgeFromDate(dateInput) {
     let birthDate;
-    
+
     if (dateInput instanceof Date) {
         birthDate = dateInput;
     } else if (typeof dateInput === 'string' && dateInput.includes('/')) {
@@ -355,15 +355,15 @@ function calculateAgeFromDate(dateInput) {
         birthDate = new Date(dateInput);
         if (isNaN(birthDate.getTime())) return null;
     }
-    
+
     const today = new Date();
     let age = today.getFullYear() - birthDate.getFullYear();
     const monthDiff = today.getMonth() - birthDate.getMonth();
-    
+
     if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
         age--;
     }
-    
+
     return age >= 0 ? age : null;
 }
 
@@ -374,13 +374,13 @@ function initializeDateInputs() {
         document.getElementById('birthdate-input'),
         document.getElementById('gap-registration-date')
     ];
-    
+
     dateInputs.forEach(input => {
         if (!input) return;
-        
+
         input.addEventListener('input', (e) => {
             let value = e.target.value.replace(/\D/g, ''); // Remove non-digits
-            
+
             // Add slashes automatically
             if (value.length >= 2) {
                 value = value.substring(0, 2) + '/' + value.substring(2);
@@ -388,10 +388,10 @@ function initializeDateInputs() {
             if (value.length >= 5) {
                 value = value.substring(0, 5) + '/' + value.substring(5, 9);
             }
-            
+
             e.target.value = value;
         });
-        
+
         // Validate date format on blur
         input.addEventListener('blur', (e) => {
             const value = e.target.value;
@@ -409,76 +409,76 @@ function isValidDate(dateString) {
     // Format: dd/mm/yyyy
     const datePattern = /^(\d{2})\/(\d{2})\/(\d{4})$/;
     const match = dateString.match(datePattern);
-    
+
     if (!match) return false;
-    
+
     const day = parseInt(match[1], 10);
     const month = parseInt(match[2], 10);
     const year = parseInt(match[3], 10);
-    
+
     // Validate ranges
     if (month < 1 || month > 12) return false;
     if (day < 1 || day > 31) return false;
     if (year < 1900 || year > 2100) return false;
-    
+
     // Check if date is valid (handles leap years, etc.)
     const date = new Date(year, month - 1, day);
     return date.getFullYear() === year &&
-           date.getMonth() === month - 1 &&
-           date.getDate() === day;
+        date.getMonth() === month - 1 &&
+        date.getDate() === day;
 }
 
 function parseDate(dateString) {
     // Parse dd/mm/yyyy to Date object
     if (!dateString) return null;
-    
+
     const datePattern = /^(\d{2})\/(\d{2})\/(\d{4})$/;
     const match = dateString.match(datePattern);
-    
+
     if (!match) return null;
-    
+
     const day = parseInt(match[1], 10);
     const month = parseInt(match[2], 10);
     const year = parseInt(match[3], 10);
-    
+
     return new Date(year, month - 1, day);
 }
 
 function formatDate(date) {
     // Format Date object to dd/mm/yyyy
     if (!date || !(date instanceof Date) || isNaN(date.getTime())) return '';
-    
+
     const day = String(date.getDate()).padStart(2, '0');
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const year = date.getFullYear();
-    
+
     return `${day}/${month}/${year}`;
 }
 
 function initializeClearButtons() {
     // Get all text and number input fields
     const inputs = document.querySelectorAll('input[type="text"], input[type="number"]');
-    
+
     inputs.forEach(input => {
         // Skip if already wrapped or if it's a file input
         if (input.closest('.input-wrapper') || input.type === 'file') return;
-        
+
         // Create wrapper
         const wrapper = document.createElement('div');
         wrapper.className = 'input-wrapper';
-        
+
         // Create clear button
         const clearBtn = document.createElement('button');
         clearBtn.type = 'button';
         clearBtn.className = 'clear-btn';
         clearBtn.innerHTML = '×';
         clearBtn.setAttribute('aria-label', 'Изчисти поле');
-        
+
         // Wrap input
         input.parentNode.insertBefore(wrapper, input);
         wrapper.appendChild(input);
         wrapper.appendChild(clearBtn);
-        
+
         // Function to toggle clear button visibility
         const toggleClearButton = () => {
             if (input.value && input.value.trim() !== '' && input.value !== '0') {
@@ -487,14 +487,14 @@ function initializeClearButtons() {
                 clearBtn.classList.remove('show');
             }
         };
-        
+
         // Initial state
         toggleClearButton();
-        
+
         // Show/hide clear button on input
         input.addEventListener('input', toggleClearButton);
         input.addEventListener('change', toggleClearButton);
-        
+
         // Clear input on button click
         clearBtn.addEventListener('click', (e) => {
             e.preventDefault();
@@ -502,7 +502,7 @@ function initializeClearButtons() {
             input.value = '';
             input.focus();
             toggleClearButton();
-            
+
             // Trigger input event for any listeners (like date formatting, age calculation, etc.)
             input.dispatchEvent(new Event('input', { bubbles: true }));
         });
@@ -514,30 +514,30 @@ function initializeCityAutocomplete() {
     const suggestionsDiv = document.getElementById('city-suggestions');
     const regionSelect = document.getElementById('address-region');
     const municipalitySelect = document.getElementById('address-municipality');
-    
+
     if (!cityInput || !suggestionsDiv || !regionSelect || !municipalitySelect) return;
-    
+
     let selectedIndex = -1;
     let filteredCities = [];
-    
+
     function filterCities(query) {
         if (!query || query.length < 1) {
             return [];
         }
         const lowerQuery = query.toLowerCase();
-        return bulgarianCities.filter(city => 
+        return bulgarianCities.filter(city =>
             city.name.toLowerCase().includes(lowerQuery)
         ).slice(0, 10); // Limit to 10 suggestions
     }
-    
+
     function displaySuggestions(cities) {
         suggestionsDiv.innerHTML = '';
-        
+
         if (cities.length === 0) {
             suggestionsDiv.classList.remove('show');
             return;
         }
-        
+
         cities.forEach((city, index) => {
             const div = document.createElement('div');
             div.className = 'autocomplete-suggestion';
@@ -545,23 +545,23 @@ function initializeCityAutocomplete() {
             div.setAttribute('data-city', city.name);
             div.setAttribute('data-region', city.region);
             div.setAttribute('data-municipality', city.municipality);
-            
+
             div.addEventListener('click', () => {
                 selectCity(city);
             });
-            
+
             div.addEventListener('mouseenter', () => {
                 selectedIndex = index;
                 updateSelectedSuggestion();
             });
-            
+
             suggestionsDiv.appendChild(div);
         });
-        
+
         suggestionsDiv.classList.add('show');
         selectedIndex = -1;
     }
-    
+
     function updateSelectedSuggestion() {
         const suggestions = suggestionsDiv.querySelectorAll('.autocomplete-suggestion');
         suggestions.forEach((suggestion, index) => {
@@ -572,15 +572,15 @@ function initializeCityAutocomplete() {
             }
         });
     }
-    
+
     function selectCity(city) {
         cityInput.value = city.name;
         suggestionsDiv.classList.remove('show');
-        
+
         // Normalize region name - handle cases like "София" vs "София (град)" or "София (област)"
         let targetRegion = city.region;
         let targetMunicipality = city.municipality;
-        
+
         // Handle София (столица) - map to София (град)
         if (city.region === 'София (столица)') {
             targetRegion = 'София (град)';
@@ -604,7 +604,7 @@ function initializeCityAutocomplete() {
                 }
             }
         }
-        
+
         // Set region first
         let regionWasChanged = false;
         if (regionSelect.value !== targetRegion) {
@@ -618,12 +618,12 @@ function initializeCityAutocomplete() {
                     break;
                 }
             }
-            
+
             if (!regionFound) {
                 // Try case-insensitive match
                 for (let i = 0; i < regionSelect.options.length; i++) {
                     const option = regionSelect.options[i];
-                    if (option.value.toLowerCase() === targetRegion.toLowerCase() || 
+                    if (option.value.toLowerCase() === targetRegion.toLowerCase() ||
                         option.textContent.toLowerCase() === targetRegion.toLowerCase()) {
                         regionSelect.value = option.value;
                         regionFound = true;
@@ -631,7 +631,7 @@ function initializeCityAutocomplete() {
                     }
                 }
             }
-            
+
             if (regionFound) {
                 regionWasChanged = true;
                 // Trigger change event to populate municipalities
@@ -639,7 +639,7 @@ function initializeCityAutocomplete() {
                 regionSelect.dispatchEvent(changeEvent);
             } else {
                 // Region not found - log for debugging
-                console.warn(`Region not found: "${targetRegion}". Available regions:`, 
+                console.warn(`Region not found: "${targetRegion}". Available regions:`,
                     Array.from(regionSelect.options).map(opt => opt.value || opt.textContent));
             }
         } else {
@@ -651,40 +651,40 @@ function initializeCityAutocomplete() {
                 regionWasChanged = true;
             }
         }
-        
+
         // Wait for municipality options to load, then set municipality
         // Use a more robust approach: wait until municipality select is populated
         const setMunicipality = () => {
             // Make sure region is set correctly (for София regions)
             const currentRegion = regionSelect.value;
             const expectedRegion = targetRegion || city.region;
-            
+
             // If region hasn't been set correctly yet, wait a bit more
-            if ((city.region === 'София' || city.region === 'София (столица)') && 
-                currentRegion !== expectedRegion && 
+            if ((city.region === 'София' || city.region === 'София (столица)') &&
+                currentRegion !== expectedRegion &&
                 currentRegion !== 'София (град)' && currentRegion !== 'София (област)') {
                 setTimeout(setMunicipality, 50);
                 return;
             }
             // Check if municipality select is populated and not disabled
             if (!municipalitySelect) return;
-            
+
             // If disabled, municipalities haven't loaded yet - try again
             if (municipalitySelect.disabled) {
                 setTimeout(setMunicipality, 50);
                 return;
             }
-            
+
             // If no options (except placeholder), wait a bit more
             if (municipalitySelect.options.length <= 1) {
                 setTimeout(setMunicipality, 50);
                 return;
             }
-            
+
             // Try to find and set the municipality
             let found = false;
             const cityMunicipality = (targetMunicipality || city.municipality).trim();
-            
+
             // Try exact match first
             for (let i = 0; i < municipalitySelect.options.length; i++) {
                 const option = municipalitySelect.options[i];
@@ -695,7 +695,7 @@ function initializeCityAutocomplete() {
                     return;
                 }
             }
-            
+
             // Try case-insensitive match
             if (!found) {
                 for (let i = 0; i < municipalitySelect.options.length; i++) {
@@ -708,7 +708,7 @@ function initializeCityAutocomplete() {
                     }
                 }
             }
-            
+
             // Try matching with textContent as well
             if (!found) {
                 for (let i = 0; i < municipalitySelect.options.length; i++) {
@@ -721,7 +721,7 @@ function initializeCityAutocomplete() {
                     }
                 }
             }
-            
+
             // Try case-insensitive match with textContent
             if (!found) {
                 for (let i = 0; i < municipalitySelect.options.length; i++) {
@@ -734,30 +734,30 @@ function initializeCityAutocomplete() {
                     }
                 }
             }
-            
+
             // If still not found, log for debugging (remove in production if needed)
             if (!found && cityMunicipality) {
-                console.warn(`Municipality not found: "${cityMunicipality}" in region "${city.region}". Available options:`, 
+                console.warn(`Municipality not found: "${cityMunicipality}" in region "${city.region}". Available options:`,
                     Array.from(municipalitySelect.options).map(opt => opt.value || opt.textContent));
             }
         };
-        
+
         // Initial attempt after 100ms
         setTimeout(setMunicipality, 100);
-        
+
         // Fallback attempts in case the first one is too early
         setTimeout(setMunicipality, 200);
         setTimeout(setMunicipality, 300);
         setTimeout(setMunicipality, 500);
     }
-    
+
     cityInput.addEventListener('input', (e) => {
         const query = e.target.value.trim();
         filteredCities = filterCities(query);
         displaySuggestions(filteredCities);
         selectedIndex = -1;
     });
-    
+
     cityInput.addEventListener('keydown', (e) => {
         if (e.key === 'ArrowDown') {
             e.preventDefault();
@@ -782,7 +782,7 @@ function initializeCityAutocomplete() {
             suggestionsDiv.classList.remove('show');
         }
     });
-    
+
     // Close suggestions when clicking outside
     document.addEventListener('click', (e) => {
         if (!cityInput.contains(e.target) && !suggestionsDiv.contains(e.target)) {
@@ -794,13 +794,13 @@ function initializeCityAutocomplete() {
 function initializeAddressRegistration() {
     // Initialize city autocomplete first
     initializeCityAutocomplete();
-    
+
     // Initialize region and municipality dropdowns in common data section
     const addressRegion = document.getElementById('address-region');
     const addressMunicipality = document.getElementById('address-municipality');
-    
+
     if (!addressRegion || !addressMunicipality) return;
-    
+
     // Populate region dropdown
     const regions = Object.keys(bulgarianRegions).sort();
     regions.forEach(region => {
@@ -809,16 +809,16 @@ function initializeAddressRegistration() {
         option.textContent = region;
         addressRegion.appendChild(option);
     });
-    
+
     // Handle region change and populate municipalities
     addressRegion.addEventListener('change', () => {
         const selectedRegion = addressRegion.value;
         addressMunicipality.innerHTML = '';
-        
+
         if (selectedRegion && bulgarianRegions[selectedRegion]) {
             addressMunicipality.disabled = false;
             addressMunicipality.innerHTML = '<option value="">Изберете община</option>';
-            
+
             const municipalities = bulgarianRegions[selectedRegion].sort();
             municipalities.forEach(municipality => {
                 const option = document.createElement('option');
@@ -852,11 +852,11 @@ function initializeInsuranceTypeSwitching() {
     insuranceBtns.forEach(btn => {
         btn.addEventListener('click', () => {
             const type = btn.dataset.type;
-            
+
             // Toggle active button (allow multiple selections)
             btn.classList.toggle('active');
             const isActive = btn.classList.contains('active');
-            
+
             // Show/hide fields based on button state (skip CASCO)
             if (type !== 'casco' && fields[type]) {
                 if (isActive) {
@@ -865,7 +865,7 @@ function initializeInsuranceTypeSwitching() {
                     fields[type].style.display = 'none';
                 }
             }
-            
+
             // Show calculate button if at least one insurance type is selected
             const hasActiveType = Array.from(insuranceBtns).some(b => b.classList.contains('active'));
             if (calculateBtn) {
@@ -877,7 +877,7 @@ function initializeInsuranceTypeSwitching() {
 
 function initializeCalculators() {
     const calculateBtn = document.getElementById('calculate-premium-btn');
-    
+
     if (calculateBtn) {
         calculateBtn.addEventListener('click', async (e) => {
             e.preventDefault();
@@ -909,7 +909,7 @@ function initializeCalculators() {
 
 async function calculatePremium(insuranceType, form, resultId) {
     const resultDiv = document.getElementById(resultId);
-    
+
     // Get common data
     const commonDataForm = document.getElementById('common-data-form');
     const commonFormData = new FormData(commonDataForm);
@@ -917,12 +917,12 @@ async function calculatePremium(insuranceType, form, resultId) {
     commonFormData.forEach((value, key) => {
         if (value) commonData[key] = value;
     });
-    
+
     // Handle EGN/Birthdate - get the active field value
     const egnInput = document.getElementById('egn-input');
     const birthdateInput = document.getElementById('birthdate-input');
     const egnBtn = document.querySelector('.input-type-btn[data-type="egn"]');
-    
+
     if (egnBtn && egnBtn.classList.contains('active')) {
         // EGN is active
         if (egnInput && egnInput.value) {
@@ -941,12 +941,12 @@ async function calculatePremium(insuranceType, form, resultId) {
     if (commonData.vehicleBrand === 'other') {
         commonData.vehicleBrand = commonData.otherBrandName || 'Друга марка';
     }
-    
+
     // Handle model selection
     const modelManualInput = document.getElementById('vehicle-model-manual');
     const modelOtherInput = document.getElementById('vehicle-model-other');
     const modelSelect = document.getElementById('vehicle-model');
-    
+
     if (modelManualInput.style.display !== 'none') {
         // Manual input for non-Hyundai brands
         commonData.vehicleModel = modelManualInput.value;
@@ -961,7 +961,7 @@ async function calculatePremium(insuranceType, form, resultId) {
     // Get insurance-specific data from the active insurance fields
     const insuranceData = {};
     const activeFields = document.querySelectorAll('.insurance-fields[style*="block"]');
-    
+
     activeFields.forEach(field => {
         const inputs = field.querySelectorAll('input, select');
         inputs.forEach(input => {
@@ -970,13 +970,13 @@ async function calculatePremium(insuranceType, form, resultId) {
             }
         });
     });
-    
+
     // Handle bonus/malus: convert to negative for malus (overcharge), keep positive for bonus (discount)
     if (insuranceType === 'casco' && insuranceData.bonusMalus) {
         const bonusBtn = document.querySelector('#casco-fields .input-type-btn[data-type="bonus"]');
         const malusBtn = document.querySelector('#casco-fields .input-type-btn[data-type="malus"]');
         const bonusMalusValue = parseFloat(insuranceData.bonusMalus) || 0;
-        
+
         if (malusBtn && malusBtn.classList.contains('active')) {
             // Малус = надбавка, изпращаме отрицателно число
             insuranceData.bonusMalus = -Math.abs(bonusMalusValue);
@@ -1005,7 +1005,7 @@ async function calculatePremium(insuranceType, form, resultId) {
             insuranceData.registrationDate = commonData.firstRegistrationDate;
         }
     }
-    
+
     // Convert dates from dd/mm/yyyy to ISO format for server
     if (commonData.firstRegistrationDate) {
         const parsedDate = parseDate(commonData.firstRegistrationDate);
@@ -1032,7 +1032,7 @@ async function calculatePremium(insuranceType, form, resultId) {
     try {
         resultDiv.classList.remove('show');
         resultDiv.innerHTML = '';
-        
+
         // For CASCO and MTPL, also get comparison
         if (insuranceType === 'casco' || insuranceType === 'mtpl') {
             const [calculateResponse, compareResponse] = await Promise.all([
@@ -1146,18 +1146,18 @@ async function calculateAllOffers() {
     commonFormData.forEach((value, key) => {
         if (value) commonData[key] = value;
     });
-    
+
     // Check owner type
     const personBtn = document.querySelector('.owner-type-btn[data-type="person"]');
     const isPerson = personBtn && personBtn.classList.contains('active');
     commonData.ownerType = isPerson ? 'person' : 'company';
-    
+
     // Handle EGN/Birthdate - only if person
     if (isPerson) {
         const egnInput = document.getElementById('egn-input');
         const birthdateInput = document.getElementById('birthdate-input');
         const egnBtn = document.querySelector('.input-type-btn[data-type="egn"]');
-        
+
         if (egnBtn && egnBtn.classList.contains('active')) {
             if (egnInput && egnInput.value) {
                 commonData.egnBirthdate = egnInput.value;
@@ -1175,16 +1175,16 @@ async function calculateAllOffers() {
         delete commonData.egn;
         delete commonData.birthdate;
     }
-    
+
     // Handle brand and model
     if (commonData.vehicleBrand === 'other') {
         commonData.vehicleBrand = commonData.otherBrandName || 'Друга марка';
     }
-    
+
     const modelManualInput = document.getElementById('vehicle-model-manual');
     const modelOtherInput = document.getElementById('vehicle-model-other');
     const modelSelect = document.getElementById('vehicle-model');
-    
+
     if (modelManualInput && modelManualInput.style.display !== 'none') {
         commonData.vehicleModel = modelManualInput.value;
     } else if (modelOtherInput && modelOtherInput.style.display !== 'none') {
@@ -1192,7 +1192,7 @@ async function calculateAllOffers() {
     } else if (modelSelect) {
         commonData.vehicleModel = modelSelect.value;
     }
-    
+
     // Convert dates
     if (commonData.firstRegistrationDate) {
         const parsedDate = parseDate(commonData.firstRegistrationDate);
@@ -1206,16 +1206,16 @@ async function calculateAllOffers() {
             commonData.birthdate = parsedDate.toISOString().split('T')[0];
         }
     }
-    
+
     // Get active insurance types
     const activeBtns = document.querySelectorAll('.insurance-btn.active');
     if (activeBtns.length === 0) {
         alert('Моля, изберете поне един тип застраховка');
         return;
     }
-    
+
     const insuranceTypes = Array.from(activeBtns).map(btn => btn.dataset.type);
-    
+
     // Get insurance-specific data (skip CASCO - will be set on offers page)
     const insuranceDataByType = {};
     insuranceTypes.forEach(type => {
@@ -1236,7 +1236,7 @@ async function calculateAllOffers() {
             }
         }
     });
-    
+
     // Calculate offers for all insurers and types
     try {
         // For each insurance type, get comparison (skip CASCO)
@@ -1245,7 +1245,7 @@ async function calculateAllOffers() {
             .map(async (type) => {
                 const insuranceData = insuranceDataByType[type] || {};
                 const data = { ...commonData, ...insuranceData };
-                
+
                 // Handle type-specific conversions
                 if (type === 'mtpl') {
                     const powerKW = parseFloat(insuranceData.powerKW) || 0;
@@ -1257,26 +1257,26 @@ async function calculateAllOffers() {
                         data.powerKW = powerHP / 1.36;
                     }
                 }
-                
+
                 if (type === 'gap' && !insuranceData.registrationDate && commonData.firstRegistrationDate) {
                     data.registrationDate = commonData.firstRegistrationDate;
                 }
-                
+
                 const response = await fetch('/api/compare', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ insuranceType: type, data })
                 });
-                
+
                 if (response.ok) {
                     const result = await response.json();
                     return { type, results: result.results || [] };
                 }
                 return { type, results: [] };
             });
-        
+
         const comparisons = await Promise.all(comparisonPromises);
-        
+
         // For CASCO, get list of insurers with tariffs (no premium calculation yet)
         let cascoInsurers = [];
         if (insuranceTypes.includes('casco')) {
@@ -1293,10 +1293,10 @@ async function calculateAllOffers() {
                 console.error('Error fetching CASCO insurers:', error);
             }
         }
-        
+
         // Group by insurer
         const insurerMap = {};
-        
+
         // Add CASCO insurers (without premiums)
         cascoInsurers.forEach(insurerInfo => {
             insurerMap[insurerInfo.insurer] = {
@@ -1312,7 +1312,7 @@ async function calculateAllOffers() {
                 }
             };
         });
-        
+
         // Add other insurance types
         comparisons.forEach(comparison => {
             comparison.results.forEach(result => {
@@ -1327,7 +1327,7 @@ async function calculateAllOffers() {
                     premium: result.premium,
                     insuranceData: insuranceDataByType[comparison.type] || {}
                 };
-                
+
                 // For MTPL, also store basePremium, tax, gf, of if available
                 if (comparison.type === 'mtpl' && result.basePremium !== undefined) {
                     insuranceTypeData.basePremium = result.basePremium;
@@ -1335,13 +1335,13 @@ async function calculateAllOffers() {
                     insuranceTypeData.gf = result.gf;
                     insuranceTypeData.of = result.of;
                 }
-                
+
                 insurerMap[result.insurer].insuranceTypes[comparison.type] = insuranceTypeData;
             });
         });
-        
+
         let offers = Object.values(insurerMap);
-        
+
         // Sort offers in specific order: ДЗИ, Дженерали, Бул Инс, Армеец, Булстрад
         const insurerOrder = ['dzi', 'generali', 'bul-ins', 'armeec', 'bulstrad'];
         offers.sort((a, b) => {
@@ -1353,14 +1353,14 @@ async function calculateAllOffers() {
             if (indexB === -1) return -1;
             return indexA - indexB;
         });
-        
+
         // Store data and navigate
         const offersData = {
             commonData,
             insuranceTypes,
             offers
         };
-        
+
         sessionStorage.setItem('offersData', JSON.stringify(offersData));
         // Save form data before navigating
         saveCalculatorFormData();
@@ -1379,7 +1379,7 @@ function saveCalculatorFormData() {
         activeInsuranceTypes: [],
         egnActive: false
     };
-    
+
     // Save common data form
     const commonDataForm = document.getElementById('common-data-form');
     if (commonDataForm) {
@@ -1388,7 +1388,7 @@ function saveCalculatorFormData() {
             if (value) formData.commonData[key] = value;
         });
     }
-    
+
     // Save active insurance type buttons
     const insuranceBtns = document.querySelectorAll('.insurance-btn');
     insuranceBtns.forEach(btn => {
@@ -1396,7 +1396,7 @@ function saveCalculatorFormData() {
             formData.activeInsuranceTypes.push(btn.dataset.type);
         }
     });
-    
+
     // Save insurance-specific data
     const insuranceFields = document.querySelectorAll('.insurance-fields');
     insuranceFields.forEach(field => {
@@ -1413,26 +1413,26 @@ function saveCalculatorFormData() {
             });
         }
     });
-    
+
     // Save owner type
     const personBtn = document.querySelector('.owner-type-btn[data-type="person"]');
     formData.ownerTypeActive = personBtn && personBtn.classList.contains('active');
-    
+
     // Save EGN/Birthdate active state
     const egnBtn = document.querySelector('.input-type-btn[data-type="egn"]');
     formData.egnActive = egnBtn && egnBtn.classList.contains('active');
-    
+
     // Save vehicle brand/model state
     const brandSelect = document.getElementById('vehicle-brand');
     if (brandSelect) {
         formData.vehicleBrandValue = brandSelect.value;
     }
-    
+
     // Save vehicle model (can be from different inputs)
     const modelSelect = document.getElementById('vehicle-model');
     const modelManualInput = document.getElementById('vehicle-model-manual');
     const modelOtherInput = document.getElementById('vehicle-model-other');
-    
+
     if (modelManualInput && modelManualInput.style.display !== 'none' && modelManualInput.value) {
         formData.vehicleModelValue = modelManualInput.value;
         formData.vehicleModelType = 'manual';
@@ -1443,19 +1443,19 @@ function saveCalculatorFormData() {
         formData.vehicleModelValue = modelSelect.value;
         formData.vehicleModelType = 'select';
     }
-    
+
     // Save address municipality
     const municipalitySelect = document.getElementById('address-municipality');
     if (municipalitySelect && municipalitySelect.value) {
         formData.addressMunicipalityValue = municipalitySelect.value;
     }
-    
+
     // Save address region (needed to restore municipality)
     const regionSelect = document.getElementById('address-region');
     if (regionSelect && regionSelect.value) {
         formData.addressRegionValue = regionSelect.value;
     }
-    
+
     sessionStorage.setItem('calculatorFormData', JSON.stringify(formData));
 }
 
@@ -1463,10 +1463,10 @@ function saveCalculatorFormData() {
 function loadCalculatorFormData() {
     const savedData = sessionStorage.getItem('calculatorFormData');
     if (!savedData) return;
-    
+
     try {
         const formData = JSON.parse(savedData);
-        
+
         // Restore common data
         if (formData.commonData) {
             Object.entries(formData.commonData).forEach(([key, value]) => {
@@ -1480,21 +1480,21 @@ function loadCalculatorFormData() {
                 }
             });
         }
-        
+
         // Restore vehicle brand first (before model)
         if (formData.vehicleBrandValue) {
             const brandSelect = document.getElementById('vehicle-brand');
             if (brandSelect) {
                 brandSelect.value = formData.vehicleBrandValue;
                 brandSelect.dispatchEvent(new Event('change', { bubbles: true }));
-                
+
                 // Restore model after brand change event has processed
                 if (formData.vehicleModelValue && formData.vehicleModelType) {
                     setTimeout(() => {
                         const modelSelect = document.getElementById('vehicle-model');
                         const modelManualInput = document.getElementById('vehicle-model-manual');
                         const modelOtherInput = document.getElementById('vehicle-model-other');
-                        
+
                         if (formData.vehicleModelType === 'manual' && modelManualInput) {
                             modelManualInput.value = formData.vehicleModelValue;
                         } else if (formData.vehicleModelType === 'other' && modelOtherInput) {
@@ -1509,14 +1509,14 @@ function loadCalculatorFormData() {
                 }
             }
         }
-        
+
         // Restore address region first (before municipality)
         if (formData.addressRegionValue) {
             const regionSelect = document.getElementById('address-region');
             if (regionSelect) {
                 regionSelect.value = formData.addressRegionValue;
                 regionSelect.dispatchEvent(new Event('change', { bubbles: true }));
-                
+
                 // Restore municipality after region change event has processed
                 if (formData.addressMunicipalityValue) {
                     setTimeout(() => {
@@ -1528,7 +1528,7 @@ function loadCalculatorFormData() {
                 }
             }
         }
-        
+
         // Restore active insurance types
         if (formData.activeInsuranceTypes && formData.activeInsuranceTypes.length > 0) {
             // Wait a bit for DOM to be ready
@@ -1539,7 +1539,7 @@ function loadCalculatorFormData() {
                         btn.click();
                     }
                 });
-                
+
                 // Restore insurance-specific data after types are activated
                 if (formData.insuranceData) {
                     setTimeout(() => {
@@ -1555,7 +1555,7 @@ function loadCalculatorFormData() {
                 }
             }, 50);
         }
-        
+
         // Restore owner type
         if (formData.ownerTypeActive !== undefined) {
             setTimeout(() => {
@@ -1568,7 +1568,7 @@ function loadCalculatorFormData() {
                 }
             }, 50);
         }
-        
+
         // Restore EGN/Birthdate active state
         if (formData.egnActive !== undefined) {
             setTimeout(() => {
@@ -1589,19 +1589,19 @@ function loadCalculatorFormData() {
 // Clear calculator form data
 function clearCalculatorFormData() {
     sessionStorage.removeItem('calculatorFormData');
-    
+
     // Clear all form fields
     const forms = document.querySelectorAll('form');
     forms.forEach(form => form.reset());
-    
+
     // Reset insurance type buttons
     const insuranceBtns = document.querySelectorAll('.insurance-btn');
     insuranceBtns.forEach(btn => btn.classList.remove('active'));
-    
+
     // Hide insurance fields
     const insuranceFields = document.querySelectorAll('.insurance-fields');
     insuranceFields.forEach(field => field.style.display = 'none');
-    
+
     // Reset owner type buttons
     const personBtn = document.querySelector('.owner-type-btn[data-type="person"]');
     const companyBtn = document.querySelector('.owner-type-btn[data-type="company"]');
@@ -1609,13 +1609,13 @@ function clearCalculatorFormData() {
     if (companyBtn) companyBtn.classList.remove('active');
     // Trigger update to show/hide EGN fields
     if (personBtn) personBtn.click();
-    
+
     // Reset EGN/Birthdate buttons
     const egnBtn = document.querySelector('.input-type-btn[data-type="egn"]');
     if (egnBtn) egnBtn.classList.add('active');
     const birthdateBtn = document.querySelector('.input-type-btn[data-type="birthdate"]');
     if (birthdateBtn) birthdateBtn.classList.remove('active');
-    
+
     // Hide calculate button
     const calculateBtn = document.getElementById('calculate-premium-btn');
     if (calculateBtn) calculateBtn.style.display = 'none';

@@ -1,5 +1,6 @@
 let currentInsurer = '';
 let currentInsuranceType = '';
+let currentPaymentType = 'cash'; // Default to 'cash'
 
 // Helper function to format tariff rate without trailing zeros
 function formatTariffRate(rate) {
@@ -70,6 +71,10 @@ function initializeInsurerSelect() {
                     tabsContainer.style.display = 'flex';
                     tabsContainer.classList.add('show');
                 }
+                // Update headers first (for CASCO, may need to show/hide model column)
+                if (currentInsuranceType === 'casco') {
+                    updateCASCOTableHeaders();
+                }
                 updateTariffEditTitle();
                 loadTariffData();
             } else {
@@ -85,6 +90,7 @@ function initializeInsurerSelect() {
 function initializeInsuranceTypeSelect() {
     const insuranceTypeButtons = document.querySelectorAll('#insurance-type-buttons .option-btn');
     const tabsContainer = document.querySelector('.tabs-container');
+    const paymentTypeGroup = document.getElementById('payment-type-group');
     
     insuranceTypeButtons.forEach(btn => {
         btn.addEventListener('click', () => {
@@ -93,6 +99,17 @@ function initializeInsuranceTypeSelect() {
             // Add active class to clicked button
             btn.classList.add('active');
             currentInsuranceType = btn.dataset.value;
+            
+            // Show/hide payment type buttons only for CASCO
+            if (paymentTypeGroup) {
+                if (currentInsuranceType === 'casco') {
+                    paymentTypeGroup.style.display = 'block';
+                } else {
+                    paymentTypeGroup.style.display = 'none';
+                    // Reset payment type when switching away from CASCO
+                    currentPaymentType = 'cash';
+                }
+            }
             
             if (currentInsurer && currentInsuranceType) {
                 if (tabsContainer) {
@@ -106,6 +123,40 @@ function initializeInsuranceTypeSelect() {
                     tabsContainer.style.display = 'none';
                     tabsContainer.classList.remove('show');
                 }
+            }
+        });
+    });
+    
+    // Initialize payment type buttons
+    initializePaymentTypeSelect();
+}
+
+function initializePaymentTypeSelect() {
+    const paymentTypeButtons = document.querySelectorAll('#payment-type-buttons .option-btn');
+    const tabsContainer = document.querySelector('.tabs-container');
+    
+    // Set first button (Кеш) as active by default
+    if (paymentTypeButtons.length > 0) {
+        paymentTypeButtons[0].classList.add('active');
+        currentPaymentType = paymentTypeButtons[0].dataset.value || 'cash';
+    }
+    
+    paymentTypeButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            // Remove active class from all buttons
+            paymentTypeButtons.forEach(b => b.classList.remove('active'));
+            // Add active class to clicked button
+            btn.classList.add('active');
+            currentPaymentType = btn.dataset.value || 'cash';
+            
+            // Reload tariff data if both insurer and insurance type are selected
+            if (currentInsurer && currentInsuranceType) {
+                // Update headers first (for CASCO, may need to show/hide model column)
+                if (currentInsuranceType === 'casco') {
+                    updateCASCOTableHeaders();
+                }
+                updateTariffEditTitle();
+                loadTariffData();
             }
         });
     });
@@ -149,6 +200,8 @@ function updateTariffSections() {
     if (currentInsuranceType === 'casco') {
         // CASCO: Show CASCO tariffs table
         document.getElementById('casco-tariffs-section').style.display = 'block';
+        // Update CASCO table headers (may include model column for Generali leasing)
+        updateCASCOTableHeaders();
         // Hide MTPL section headers
         const mtplThead = document.getElementById('mtpl-tariffs-thead');
         if (mtplThead) mtplThead.innerHTML = '';
@@ -156,6 +209,36 @@ function updateTariffSections() {
         // MTPL: Show MTPL tariffs table with dynamic headers based on insurer
         document.getElementById('mtpl-tariffs-section').style.display = 'block';
         updateMTPLTableHeaders();
+    }
+}
+
+function updateCASCOTableHeaders() {
+    const thead = document.querySelector('#tariffs-table thead tr');
+    if (!thead) return;
+    
+    // Check if we need model column (Generali + leasing)
+    const needsModelColumn = currentInsurer === 'generali' && currentPaymentType === 'leasing';
+    
+    // Find existing model header
+    const existingModelHeader = Array.from(thead.querySelectorAll('th')).find(th => th.textContent.trim() === 'Модел');
+    
+    if (needsModelColumn) {
+        // Add model column if it doesn't exist
+        if (!existingModelHeader) {
+            // Insert model column before "Тарифен процент"
+            const rateHeader = Array.from(thead.querySelectorAll('th')).find(th => th.textContent.includes('Тарифен процент'));
+            if (rateHeader) {
+                const modelHeader = document.createElement('th');
+                modelHeader.textContent = 'Модел';
+                modelHeader.style.minWidth = '200px';
+                rateHeader.insertAdjacentElement('beforebegin', modelHeader);
+            }
+        }
+    } else {
+        // Remove model column if it exists
+        if (existingModelHeader) {
+            existingModelHeader.remove();
+        }
     }
 }
 
@@ -215,6 +298,11 @@ function initializeTables() {
     document.getElementById('add-tariff-row').addEventListener('click', () => {
         addTariffRow(null, null, true);
     });
+    
+    // Copy last CASCO tariff row button
+    document.getElementById('copy-last-tariff-row')?.addEventListener('click', () => {
+        copyLastTariffRow();
+    });
 
     document.getElementById('add-discount-row').addEventListener('click', () => {
         addDiscountRow(null, null, true);
@@ -237,6 +325,41 @@ function initializeTables() {
     document.getElementById('copy-last-mtpl-row')?.addEventListener('click', () => {
         copyLastMTPLTariffRow();
     });
+}
+
+function copyLastTariffRow() {
+    const tbody = document.getElementById('tariffs-tbody');
+    if (!tbody) return;
+    
+    const viewRows = Array.from(tbody.querySelectorAll('tr.view-row'));
+    if (viewRows.length === 0) {
+        alert('Няма редове за копиране. Моля, добавете първо ред.');
+        return;
+    }
+    
+    // Get the last row's data
+    const lastRow = viewRows[viewRows.length - 1];
+    const lastRowDataJson = lastRow.getAttribute('data-row-data');
+    if (!lastRowDataJson) {
+        alert('Не може да се копира последният ред.');
+        return;
+    }
+    
+    const lastRowData = JSON.parse(lastRowDataJson);
+    
+    // Create a copy - deep copy
+    const copiedData = JSON.parse(JSON.stringify(lastRowData));
+    
+    // Add new row with copied data in edit mode
+    addTariffRow(copiedData, null, true);
+    
+    // Scroll to the new row
+    setTimeout(() => {
+        const newRow = tbody.querySelector('tr.editing-row:last-child');
+        if (newRow) {
+            newRow.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+    }, 100);
 }
 
 function copyLastMTPLTariffRow() {
@@ -281,14 +404,40 @@ function addTariffRow(rowData = null, insertAfterRow = null, isNew = false) {
     
     const isEditing = isNew || !rowData;
     
+    // Check if we need model column (Generali + leasing)
+    const needsModelColumn = currentInsurer === 'generali' && currentPaymentType === 'leasing';
+    
+    // Hyundai models list
+        const hyundaiModels = ['i10', 'i20', 'i30', 'i30 N', 'i40', 'Kona', 'Tucson', 'Santa Fe', 'Elantra', 'IONIQ', 'IONIQ 5', 'IONIQ 6', 'IONIQ 9', 'Bayon', 'ix35', 'Staria'];
+        
     if (isEditing) {
         // Editing mode - show inputs with "Добави" button
+        let modelCell = '';
+        if (needsModelColumn) {
+            // Get selected models (can be array or single value for backward compatibility)
+            const selectedModels = Array.isArray(rowData?.models) ? rowData.models : 
+                                  (rowData?.model ? [rowData.model] : []);
+            
+            // Create checkbox container
+            let modelCheckboxes = '<div class="model-checkboxes" style="display: flex; flex-wrap: wrap; gap: 5px; max-width: 200px;">';
+            hyundaiModels.forEach(model => {
+                const isChecked = selectedModels.includes(model) ? 'checked' : '';
+                modelCheckboxes += `<label style="display: flex; align-items: center; font-size: 0.85rem; white-space: nowrap;">
+                    <input type="checkbox" class="tariff-model-checkbox" value="${model}" ${isChecked} style="margin-right: 3px;">
+                    ${model}
+                </label>`;
+            });
+            modelCheckboxes += '</div>';
+            modelCell = `<td style="min-width: 200px;">${modelCheckboxes}</td>`;
+        }
+        
         row.innerHTML = `
             <td></td>
             <td><input type="number" class="tariff-from-age" value="${rowData?.fromAge || ''}" min="0" step="1"></td>
             <td><input type="number" class="tariff-to-age" value="${rowData?.toAge || ''}" min="0" step="1"></td>
             <td><input type="number" class="tariff-from-value" value="${rowData?.fromValue || ''}" min="0" step="0.01"></td>
             <td><input type="number" class="tariff-to-value" value="${rowData?.toValue || ''}" min="0" step="0.01"></td>
+            ${modelCell}
             <td><input type="number" class="tariff-rate" value="${rowData?.rate ? formatTariffRate(rowData.rate) : ''}" min="0" step="0.001"></td>
             <td>
                 <button class="btn-action btn-save" onclick="saveTariffRow(this)" title="ОК">ОК</button>
@@ -297,6 +446,15 @@ function addTariffRow(rowData = null, insertAfterRow = null, isNew = false) {
         row.classList.add('editing-row');
     } else {
         // View mode - show text with "Изтрий" and "Редактирай" buttons
+        let modelCell = '';
+        if (needsModelColumn) {
+            // Get selected models (can be array or single value for backward compatibility)
+            const selectedModels = Array.isArray(rowData?.models) ? rowData.models : 
+                                  (rowData?.model ? [rowData.model] : []);
+            const modelDisplay = selectedModels.length > 0 ? selectedModels.join(', ') : 'Всички';
+            modelCell = `<td class="tariff-model-display" style="max-width: 200px;">${modelDisplay}</td>`;
+        }
+        
         row.innerHTML = `
             <td>
                 <button class="btn-action btn-move-up" onclick="moveTariffRowUp(this)" title="Нагоре">↑</button>
@@ -306,6 +464,7 @@ function addTariffRow(rowData = null, insertAfterRow = null, isNew = false) {
             <td class="tariff-to-age-display">${rowData.toAge !== null && rowData.toAge !== undefined ? rowData.toAge : ''}</td>
             <td class="tariff-from-value-display">${rowData.fromValue !== null && rowData.fromValue !== undefined ? rowData.fromValue : ''}</td>
             <td class="tariff-to-value-display">${rowData.toValue !== null && rowData.toValue !== undefined ? rowData.toValue : ''}</td>
+            ${modelCell}
             <td class="tariff-rate-display">${formatTariffRate(rowData.rate)}</td>
             <td>
                 <button class="btn-action btn-edit" onclick="editTariffRow(this)" title="Редактирай">Редактирай</button>
@@ -331,6 +490,11 @@ function saveTariffRow(btn) {
     const toValue = row.querySelector('.tariff-to-value').value;
     const rate = row.querySelector('.tariff-rate').value;
     
+    // Check if we need model column (Generali + leasing)
+    const needsModelColumn = currentInsurer === 'generali' && currentPaymentType === 'leasing';
+    const modelCheckboxes = row.querySelectorAll('.tariff-model-checkbox:checked');
+    const selectedModels = Array.from(modelCheckboxes).map(cb => cb.value);
+    
     const rowData = {
         fromAge: fromAge ? parseInt(fromAge) : null,
         toAge: toAge ? parseInt(toAge) : null,
@@ -338,6 +502,11 @@ function saveTariffRow(btn) {
         toValue: toValue ? parseFloat(toValue) : null,
         rate: rate ? parseFloat(rate) : null
     };
+    
+    // Add models only if needed and if any are selected
+    if (needsModelColumn) {
+        rowData.models = selectedModels.length > 0 ? selectedModels : null;
+    }
     
     console.log('Saving tariff row with data:', rowData);
     
@@ -733,6 +902,8 @@ function collectTableData() {
 function loadTableData(data) {
     if (currentInsuranceType === 'casco') {
         // CASCO: Load tariffs
+        // Update headers first to ensure model column is shown/hidden correctly
+        updateCASCOTableHeaders();
         const tariffsTbody = document.getElementById('tariffs-tbody');
         tariffsTbody.innerHTML = '';
         if (data.tariffs && data.tariffs.length > 0) {
@@ -780,7 +951,13 @@ async function loadTariffData() {
     updateTariffSections();
     
     try {
-        const tariffKey = `${currentInsurer}-${currentInsuranceType}`;
+        // For CASCO, include payment type in the tariff key
+        let tariffKey;
+        if (currentInsuranceType === 'casco') {
+            tariffKey = `${currentInsurer}-${currentInsuranceType}-${currentPaymentType}`;
+        } else {
+            tariffKey = `${currentInsurer}-${currentInsuranceType}`;
+        }
         const response = await fetch(`/api/admin/tariffs/${tariffKey}`);
         if (response.ok) {
             const data = await response.json();
@@ -804,7 +981,13 @@ async function saveTariffData() {
     console.log('Saving tariff data:', data);
     
     try {
-        const tariffKey = `${currentInsurer}-${currentInsuranceType}`;
+        // For CASCO, include payment type in the tariff key
+        let tariffKey;
+        if (currentInsuranceType === 'casco') {
+            tariffKey = `${currentInsurer}-${currentInsuranceType}-${currentPaymentType}`;
+        } else {
+            tariffKey = `${currentInsurer}-${currentInsuranceType}`;
+        }
         const response = await fetch(`/api/admin/tariffs/${tariffKey}`, {
             method: 'POST',
             headers: {

@@ -1,0 +1,151 @@
+{
+  "tariffs": [
+    {
+      "fromAge": 0,
+      "toAge": 1,
+      "fromValue": null,
+      "toValue": 25564.59,
+      "rate": 4.4,
+      "models": [
+        "i30 N",
+        "Kona",
+        "Tucson",
+        "Santa Fe",
+        "IONIQ 5",
+        "IONIQ 6",
+        "IONIQ 9",
+        "Staria"
+      ]
+    },
+    {
+      "fromAge": 0,
+      "toAge": 1,
+      "fromValue": 25564.6,
+      "toValue": null,
+      "rate": 4.1,
+      "models": [
+        "i30 N",
+        "Kona",
+        "Tucson",
+        "Santa Fe",
+        "IONIQ 5",
+        "IONIQ 6",
+        "IONIQ 9",
+        "Staria"
+      ]
+    },
+    {
+      "fromAge": 0,
+      "toAge": 1,
+      "fromValue": null,
+      "toValue": null,
+      "rate": 4.4,
+      "models": [
+        "i10",
+        "i20",
+        "i30",
+        "i40",
+        "Elantra",
+        "IONIQ",
+        "Bayon",
+        "ix35",
+        "Staria"
+      ]
+    },
+    {
+      "fromAge": 1,
+      "toAge": 3,
+      "fromValue": 25564.6,
+      "toValue": null,
+      "rate": 4.2,
+      "models": [
+        "i30 N",
+        "Kona",
+        "Tucson",
+        "Santa Fe",
+        "IONIQ 5",
+        "IONIQ 6",
+        "IONIQ 9",
+        "Staria"
+      ]
+    },
+    {
+      "fromAge": 1,
+      "toAge": 3,
+      "fromValue": 0,
+      "toValue": 25564.59,
+      "rate": 4.8,
+      "models": [
+        "i30 N",
+        "Kona",
+        "Tucson",
+        "Santa Fe",
+        "IONIQ 5",
+        "IONIQ 6",
+        "IONIQ 9",
+        "Staria"
+      ]
+    },
+    {
+      "fromAge": 1,
+      "toAge": 5,
+      "fromValue": null,
+      "toValue": null,
+      "rate": 4.8,
+      "models": [
+        "i10",
+        "i20",
+        "i30",
+        "i40",
+        "Elantra",
+        "IONIQ",
+        "Bayon",
+        "ix35"
+      ]
+    },
+    {
+      "fromAge": 3,
+      "toAge": 5,
+      "fromValue": 25564.6,
+      "toValue": null,
+      "rate": 4.4,
+      "models": [
+        "i30 N",
+        "Kona",
+        "Tucson",
+        "Santa Fe",
+        "IONIQ 5",
+        "IONIQ 6",
+        "IONIQ 9",
+        "Staria"
+      ]
+    },
+    {
+      "fromAge": 3,
+      "toAge": 5,
+      "fromValue": 0,
+      "toValue": 25564.59,
+      "rate": 4.8,
+      "models": [
+        "i30 N",
+        "Kona",
+        "Tucson",
+        "Santa Fe",
+        "IONIQ 5",
+        "IONIQ 6",
+        "IONIQ 9",
+        "Staria"
+      ]
+    },
+    {
+      "fromAge": 5,
+      "toAge": 8,
+      "fromValue": null,
+      "toValue": null,
+      "rate": 6.3,
+      "models": null
+    }
+  ],
+  "discounts": [],
+  "surcharges": []
+}

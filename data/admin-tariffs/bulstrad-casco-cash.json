@@ -1,0 +1,62 @@
+{
+  "tariffs": [
+    {
+      "fromAge": 0,
+      "toAge": 3,
+      "fromValue": null,
+      "toValue": null,
+      "rate": 4.94
+    },
+    {
+      "fromAge": 3,
+      "toAge": 5,
+      "fromValue": null,
+      "toValue": null,
+      "rate": 5.75
+    },
+    {
+      "fromAge": 5,
+      "toAge": 7,
+      "fromValue": null,
+      "toValue": null,
+      "rate": 6.36
+    },
+    {
+      "fromAge": 7,
+      "toAge": 13,
+      "fromValue": null,
+      "toValue": null,
+      "rate": 7.1
+    },
+    {
+      "fromAge": 13,
+      "toAge": null,
+      "fromValue": null,
+      "toValue": null,
+      "rate": 7.19
+    }
+  ],
+  "discounts": [],
+  "surcharges": [
+    {
+      "type": "За възраст",
+      "condition": "Собственик/лизингополучател на възраст до 25 години",
+      "value": 10
+    },
+    {
+      "type": "За възраст",
+      "condition": "Собственик/лизингополучател на възраст от 25 до 30 години",
+      "value": 5
+    },
+    {
+      "type": "За ползване на официален сервиз",
+      "condition": "Право на официален сервиз за МПС над 4 до 7 г. вкл.",
+      "value": 40
+    },
+    {
+      "type": "За ползване на доверен сервиз с оригинални части",
+      "condition": "Право на доверен сервиз с оригинални части за леки и товарни автомобили с общо тегло до 3.5 т.",
+      "value": 20
+    }
+  ]
+}

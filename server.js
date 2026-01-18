@@ -236,14 +236,32 @@ function calculateTariffRate(data, tariff) {
   
   // Check if new admin tariff structure (has tariffs array)
   if (tariff.tariffs && Array.isArray(tariff.tariffs)) {
+    // Get vehicle model from data (for Generali leasing)
+    const vehicleModel = data.vehicleModel || null;
+    
     for (const tariffRow of tariff.tariffs) {
       const fromAge = tariffRow.fromAge !== null && tariffRow.fromAge !== undefined ? tariffRow.fromAge : 0;
       const toAge = tariffRow.toAge !== null && tariffRow.toAge !== undefined ? tariffRow.toAge : Infinity;
       const fromValue = tariffRow.fromValue !== null && tariffRow.fromValue !== undefined ? tariffRow.fromValue : 0;
       const toValue = tariffRow.toValue !== null && tariffRow.toValue !== undefined ? tariffRow.toValue : Infinity;
       
+      // Check model match (if models are specified in tariff row)
+      // If tariff row has models array, vehicle model must be in the array
+      // If tariff row has single model (backward compatibility), it must match
+      // If tariff row has no models (null/empty), it matches all models
+      let modelMatches = true;
+      if (tariffRow.models && Array.isArray(tariffRow.models) && tariffRow.models.length > 0) {
+        // Check if vehicle model is in the models array
+        modelMatches = vehicleModel && tariffRow.models.includes(vehicleModel);
+      } else if (tariffRow.model) {
+        // Backward compatibility: single model value
+        modelMatches = !vehicleModel || tariffRow.model === vehicleModel;
+      }
+      // If no models specified, matches all (modelMatches stays true)
+      
       if (vehicleAge >= fromAge && vehicleAge <= toAge && 
-          insuranceSum >= fromValue && insuranceSum <= toValue) {
+          insuranceSum >= fromValue && insuranceSum <= toValue &&
+          modelMatches) {
         return (tariffRow.rate || 0) / 100; // Convert percentage to decimal
       }
     }
@@ -287,7 +305,9 @@ app.post('/api/calculate', (req, res) => {
         // If insurer is specified, use that specific tariff
         if (insurer) {
           const adminTariffsDir = path.join(__dirname, 'data', 'admin-tariffs');
-          const insurerFile = path.join(adminTariffsDir, `${insurer}-casco.json`);
+          // Get payment type (cash or leasing) - default to cash
+          const paymentType = data.paymentType || 'cash';
+          const insurerFile = path.join(adminTariffsDir, `${insurer}-casco-${paymentType}.json`);
           if (fs.existsSync(insurerFile)) {
             const insurerTariff = JSON.parse(fs.readFileSync(insurerFile, 'utf8'));
             premium = calculateCascoPremium(data, insurerTariff);
@@ -841,10 +861,14 @@ function calculateGAPPremium(data, tariff) {
 const { requireAuth, requireAdmin, redirectToLogin, redirectToLoginIfNotAdmin } = require('./middleware/auth');
 
 // Admin API: Get tariffs for specific insurer (requires authentication)
+// Format: /api/admin/tariffs/:insurer or /api/admin/tariffs/:insurer-type-payment
+// For CASCO: insurer-casco-cash or insurer-casco-leasing
+// For other types: insurer-mtpl, insurer-gap, etc.
 app.get('/api/admin/tariffs/:insurer', requireAuth, async (req, res) => {
   try {
     const insurer = req.params.insurer;
     const adminTariffsDir = path.join(__dirname, 'data', 'admin-tariffs');
+    // The insurer parameter can be like "generali-casco-cash" or just "generali"
     const insurerFile = path.join(adminTariffsDir, `${insurer}.json`);
 
     if (fs.existsSync(insurerFile)) {

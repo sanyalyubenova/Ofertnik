@@ -509,6 +509,8 @@ function attachEventListeners() {
     container.addEventListener('input', (e) => {
         if (e.target.classList.contains('casco-tariff-rate')) {
             const index = parseInt(e.target.dataset.insurerIndex);
+            // Mark as manually edited
+            e.target.dataset.manualEdit = 'true';
             recalculateCascoPremiumWithManualTariff(index);
         }
     });
@@ -1423,8 +1425,9 @@ async function recalculateCascoPremium(insurerIndex) {
             
             // Update tariff rate input if available (only if not manually edited)
             const tariffRateInput = document.querySelector(`.casco-tariff-rate[data-insurer-index="${insurerIndex}"]`);
-            if (tariffRateInput && result.tariffRate && tariffRateInput.tagName === 'INPUT') {
-                // Only update if input is empty or hasn't been manually changed
+            if (tariffRateInput && result.tariffRate !== undefined && result.tariffRate !== null && tariffRateInput.tagName === 'INPUT') {
+                // Only update if input hasn't been manually edited
+                // Always update if not manually edited, even if input has a value
                 if (!tariffRateInput.dataset.manualEdit) {
                     tariffRateInput.value = formatTariffRate(result.tariffRate);
                 }
