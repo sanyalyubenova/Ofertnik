@@ -35,7 +35,7 @@ const bulgarianRegions = {
     'Сливен': ['Котел', 'Нова Загора', 'Сливен', 'Твърдица'],
     'Смолян': ['Баня', 'Борино', 'Девин', 'Доспат', 'Златоград', 'Мадан', 'Неделино', 'Рудозем', 'Смолян', 'Чепеларе'],
     'София (град)': ['София'],
-    'София (област)': ['Антон', 'Божурище', 'Ботевград', 'Годеч', 'Горна Малина', 'Долна баня', 'Драгоман', 'Елин Пелин', 'Етрополе', 'Златица', 'Ихтиман', 'Копривщица', 'Костенец', 'Костинброд', 'Мирково', 'Пирдоп', 'Правец', 'Самоков', 'Своге', 'Сливница', 'Стара Загора', 'Чавдар', 'Челопеч'],
+    'София (област)': ['Антон', 'Божурище', 'Ботевград', 'Годеч', 'Горна Малина', 'Долна баня', 'Драгоман', 'Елин Пелин', 'Етрополе', 'Златица', 'Ихтиман', 'Копривщица', 'Костенец', 'Костинброд', 'Мирково', 'Пирдоп', 'Правец', 'Самоков', 'Своге', 'Сливница', 'Чавдар', 'Челопеч'],
     'Стара Загора': ['Братя Даскалови', 'Гурково', 'Гълъбово', 'Казанлък', 'Мъглиж', 'Николаево', 'Опан', 'Павел баня', 'Раднево', 'Стара Загора', 'Чирпан'],
     'Търговище': ['Антоново', 'Омуртаг', 'Опака', 'Попово', 'Търговище'],
     'Хасково': ['Димитровград', 'Ивайловград', 'Любимец', 'Маджарово', 'Минерални бани', 'Симеоновград', 'Стамболово', 'Тополовград', 'Харманли', 'Хасково'],
@@ -579,7 +579,16 @@ function initializeCityAutocomplete() {
         
         // Normalize region name - handle cases like "София" vs "София (град)" or "София (област)"
         let targetRegion = city.region;
-        if (city.region === 'София') {
+        let targetMunicipality = city.municipality;
+        
+        // Handle София (столица) - map to София (град)
+        if (city.region === 'София (столица)') {
+            targetRegion = 'София (град)';
+            // Map Столична municipality to София for the dropdown
+            if (city.municipality === 'Столична') {
+                targetMunicipality = 'София';
+            }
+        } else if (city.region === 'София') {
             // Check if municipality exists in "София (град)" or "София (област)"
             if (city.municipality === 'София') {
                 targetRegion = 'София (град)';
@@ -597,6 +606,7 @@ function initializeCityAutocomplete() {
         }
         
         // Set region first
+        let regionWasChanged = false;
         if (regionSelect.value !== targetRegion) {
             // Find the region option (handle exact match first, then case-insensitive)
             let regionFound = false;
@@ -623,6 +633,7 @@ function initializeCityAutocomplete() {
             }
             
             if (regionFound) {
+                regionWasChanged = true;
                 // Trigger change event to populate municipalities
                 const changeEvent = new Event('change', { bubbles: true, cancelable: true });
                 regionSelect.dispatchEvent(changeEvent);
@@ -630,6 +641,14 @@ function initializeCityAutocomplete() {
                 // Region not found - log for debugging
                 console.warn(`Region not found: "${targetRegion}". Available regions:`, 
                     Array.from(regionSelect.options).map(opt => opt.value || opt.textContent));
+            }
+        } else {
+            // Region is already set correctly, but ensure municipalities are loaded
+            // If municipality select is disabled or empty, trigger change event to load municipalities
+            if (municipalitySelect && (municipalitySelect.disabled || municipalitySelect.options.length <= 1)) {
+                const changeEvent = new Event('change', { bubbles: true, cancelable: true });
+                regionSelect.dispatchEvent(changeEvent);
+                regionWasChanged = true;
             }
         }
         
@@ -641,7 +660,8 @@ function initializeCityAutocomplete() {
             const expectedRegion = targetRegion || city.region;
             
             // If region hasn't been set correctly yet, wait a bit more
-            if (city.region === 'София' && currentRegion !== expectedRegion && 
+            if ((city.region === 'София' || city.region === 'София (столица)') && 
+                currentRegion !== expectedRegion && 
                 currentRegion !== 'София (град)' && currentRegion !== 'София (област)') {
                 setTimeout(setMunicipality, 50);
                 return;
@@ -663,7 +683,7 @@ function initializeCityAutocomplete() {
             
             // Try to find and set the municipality
             let found = false;
-            const cityMunicipality = city.municipality.trim();
+            const cityMunicipality = (targetMunicipality || city.municipality).trim();
             
             // Try exact match first
             for (let i = 0; i < municipalitySelect.options.length; i++) {
@@ -866,21 +886,22 @@ function initializeCalculators() {
     }
 
     // Power conversion (kW <-> HP)
+    // Formula: 1kW = 1.36 к.с.
     const powerKWInput = document.getElementById('mtpl-power-kw');
     const powerHPInput = document.getElementById('mtpl-power-hp');
 
     if (powerKWInput && powerHPInput) {
         powerKWInput.addEventListener('input', () => {
             if (powerKWInput.value) {
-                const hp = parseFloat(powerKWInput.value) / 1.36;
-                powerHPInput.value = hp.toFixed(2);
+                const hp = parseFloat(powerKWInput.value) * 1.36;
+                powerHPInput.value = Math.round(hp).toString();
             }
         });
 
         powerHPInput.addEventListener('input', () => {
             if (powerHPInput.value) {
-                const kw = parseFloat(powerHPInput.value) * 1.36;
-                powerKWInput.value = kw.toFixed(2);
+                const kw = parseFloat(powerHPInput.value) / 1.36;
+                powerKWInput.value = Math.round(kw).toString();
             }
         });
     }
@@ -966,6 +987,7 @@ async function calculatePremium(insuranceType, form, resultId) {
     }
 
     // For MTPL, handle power conversion
+    // Formula: 1kW = 1.36 к.с.
     if (insuranceType === 'mtpl') {
         const powerKW = parseFloat(insuranceData.powerKW) || 0;
         const powerHP = parseFloat(insuranceData.powerHP) || 0;
@@ -973,7 +995,7 @@ async function calculatePremium(insuranceType, form, resultId) {
         if (powerKW > 0) {
             insuranceData.powerKW = powerKW;
         } else if (powerHP > 0) {
-            insuranceData.powerKW = powerHP * 1.36;
+            insuranceData.powerKW = powerHP / 1.36;
         }
     }
 
@@ -1231,7 +1253,8 @@ async function calculateAllOffers() {
                     if (powerKW > 0) {
                         data.powerKW = powerKW;
                     } else if (powerHP > 0) {
-                        data.powerKW = powerHP * 1.36;
+                        // Formula: 1kW = 1.36 к.с., so kW = к.с. / 1.36
+                        data.powerKW = powerHP / 1.36;
                     }
                 }
                 
